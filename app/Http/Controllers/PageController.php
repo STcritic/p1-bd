@@ -19,7 +19,9 @@ class PageController extends Controller
 
     public function services(): View
     {
-        return $this->page('services', 'pt');
+        return $this->page('services', 'pt', [
+            'guides' => $this->guides('pt'),
+        ]);
     }
 
     public function events(): View
@@ -44,7 +46,9 @@ class PageController extends Controller
 
     public function servicesEn(): View
     {
-        return $this->page('services', 'en');
+        return $this->page('services', 'en', [
+            'guides' => $this->guides('en'),
+        ]);
     }
 
     public function eventsEn(): View
@@ -57,10 +61,40 @@ class PageController extends Controller
         return $this->page('contact', 'en');
     }
 
-    private function page(string $view, string $locale): View
+    public function resource(string $guide): View
+    {
+        return $this->resourcePage($guide, 'pt');
+    }
+
+    public function resourceEn(string $guide): View
+    {
+        return $this->resourcePage($guide, 'en');
+    }
+
+    private function page(string $view, string $locale, array $data = []): View
     {
         App::setLocale($locale);
 
-        return view("pages.{$view}", compact('locale'));
+        return view("pages.{$view}", ['locale' => $locale, ...$data]);
+    }
+
+    private function resourcePage(string $slug, string $locale): View
+    {
+        App::setLocale($locale);
+
+        $guide = collect($this->guides($locale))->firstWhere('slug', $slug);
+
+        abort_if(! $guide, 404);
+
+        return view('pages.resource', [
+            'locale' => $locale,
+            'guide' => $guide,
+            'guides' => $this->guides($locale),
+        ]);
+    }
+
+    private function guides(string $locale): array
+    {
+        return config("service_guides.{$locale}", []);
     }
 }

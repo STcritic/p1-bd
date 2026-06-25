@@ -43,6 +43,8 @@ const revealSelectors = [
     '.method-card', '.leadership-card',
     '.inner-hero-copy', '.inner-data-card', '.inner-principle-card', '.expertise-chip',
     '.learning-formats > article', '.contact-actions > a',
+    '.resource-teaser-card', '.guide-cover-card', '.guide-panel', '.guide-checklist label',
+    '.guide-deliverable-grid > div', '.guide-next-step',
 ];
 
 document.querySelectorAll(revealSelectors.join(',')).forEach((element, index) => {
@@ -90,7 +92,7 @@ const counterObserver = new IntersectionObserver((entries, observer) => {
 
 document.querySelectorAll('.values-grid strong, .hero-proof strong').forEach((counter) => counterObserver.observe(counter));
 
-const interactiveCards = document.querySelectorAll('.service-card, .team-card, .purpose-grid article, .capability-card, .method-card, .metric-tile, .services-list article, .inner-data-card, .inner-principle-card, .expertise-chip, .learning-formats > article');
+const interactiveCards = document.querySelectorAll('.service-card, .team-card, .purpose-grid article, .capability-card, .method-card, .metric-tile, .services-list article, .inner-data-card, .inner-principle-card, .expertise-chip, .learning-formats > article, .resource-teaser-card');
 
 if (!reduceMotion && window.matchMedia('(pointer: fine)').matches) {
     interactiveCards.forEach((card) => {
@@ -169,6 +171,10 @@ window.addEventListener('scroll', () => {
 
 backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
 updateScrollEffects();
+
+document.querySelectorAll('[data-print-guide]').forEach((button) => {
+    button.addEventListener('click', () => window.print());
+});
 
 const logoRow = document.querySelector('.logo-row');
 if (logoRow && !reduceMotion) {

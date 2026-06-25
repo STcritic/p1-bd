@@ -104,7 +104,7 @@
 
 <section class="section leadership-feature">
     <div class="container leadership-card">
-        <div class="leadership-image"><img src="{{ asset('assets/images/team-sandra-v2.png') }}" alt="Sandra Nhachale" loading="lazy"><span>{{ $en ? 'Leadership perspective' : 'Perspectiva de liderança' }}</span></div>
+        <div class="leadership-image"><img src="{{ asset('assets/images/team_02.png') }}" alt="Sandra Nhachale" loading="lazy"><span>{{ $en ? 'Leadership perspective' : 'Perspectiva de liderança' }}</span></div>
         <div class="leadership-copy"><span class="eyebrow">{{ $en ? 'EXPERIENCE WITH PURPOSE' : 'EXPERIÊNCIA COM PROPÓSITO' }}</span><h2>{{ $en ? 'Senior counsel, grounded in the reality of your business.' : 'Assessoria sénior, ancorada na realidade do seu negócio.' }}</h2><p class="lead">{{ $en ? 'Our approach brings together more than two decades of human resources experience and a practical commitment to helping organisations perform through people.' : 'A nossa abordagem reúne mais de duas décadas de experiência em Recursos Humanos e um compromisso prático de ajudar organizações a alcançar resultados através das pessoas.' }}</p><div class="leadership-signature"><strong>Sandra Nhachale</strong><span>{{ $en ? 'Managing Director' : 'Directora Geral' }}</span></div><a class="arrow-link" href="{{ route($en ? 'en.about' : 'about') }}">{{ $en ? 'Meet our team' : 'Conheça a equipa' }} <span>→</span></a></div>
     </div>
 </section>

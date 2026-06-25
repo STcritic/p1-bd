@@ -10,6 +10,11 @@ Route::get('/sitemap.xml', function () {
         route('en.home'), route('en.about'), route('en.services'), route('en.events'), route('en.contact'),
     ];
 
+    foreach (array_column(config('service_guides.pt', []), 'slug') as $slug) {
+        $urls[] = route('resource.show', $slug);
+        $urls[] = route('en.resource.show', $slug);
+    }
+
     return response()
         ->view('sitemap', compact('urls'))
         ->header('Content-Type', 'application/xml');
@@ -18,6 +23,7 @@ Route::get('/sitemap.xml', function () {
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/sobre-nos', [PageController::class, 'about'])->name('about');
 Route::get('/servicos', [PageController::class, 'services'])->name('services');
+Route::get('/recursos/{guide}', [PageController::class, 'resource'])->name('resource.show');
 Route::get('/eventos', [PageController::class, 'events'])->name('events');
 Route::get('/contactos', [PageController::class, 'contact'])->name('contact');
 Route::post('/contactos', [ContactController::class, 'store'])
@@ -28,6 +34,7 @@ Route::prefix('en')->name('en.')->group(function (): void {
     Route::get('/', [PageController::class, 'homeEn'])->name('home');
     Route::get('/about', [PageController::class, 'aboutEn'])->name('about');
     Route::get('/services', [PageController::class, 'servicesEn'])->name('services');
+    Route::get('/resources/{guide}', [PageController::class, 'resourceEn'])->name('resource.show');
     Route::get('/events', [PageController::class, 'eventsEn'])->name('events');
     Route::get('/contact', [PageController::class, 'contactEn'])->name('contact');
     Route::post('/contact', [ContactController::class, 'storeEn'])
