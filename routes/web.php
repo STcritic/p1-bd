@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\AnnouncementAdminController;
+use App\Http\Controllers\AnnouncementAuthController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +32,24 @@ Route::get('/contactos', [PageController::class, 'contact'])->name('contact');
 Route::post('/contactos', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
+
+Route::get('/area-colaborador', [AnnouncementAuthController::class, 'showLogin'])->name('announcements.login');
+Route::post('/area-colaborador', [AnnouncementAuthController::class, 'login'])
+    ->middleware('throttle:6,1')
+    ->name('announcements.login.store');
+Route::post('/area-colaborador/sair', [AnnouncementAuthController::class, 'logout'])->name('announcements.logout');
+
+Route::prefix('area-colaborador/anuncios')
+    ->name('announcements.')
+    ->middleware('announcement.admin')
+    ->group(function (): void {
+        Route::get('/', [AnnouncementController::class, 'index'])->name('dashboard');
+        Route::post('/', [AnnouncementController::class, 'store'])->name('store');
+        Route::patch('/{announcement}/estado', [AnnouncementController::class, 'toggle'])->name('toggle');
+        Route::delete('/{announcement}', [AnnouncementController::class, 'destroy'])->name('destroy');
+        Route::post('/acessos', [AnnouncementAdminController::class, 'store'])->name('admins.store');
+        Route::delete('/acessos/{admin}', [AnnouncementAdminController::class, 'destroy'])->name('admins.destroy');
+    });
 
 Route::prefix('en')->name('en.')->group(function (): void {
     Route::get('/', [PageController::class, 'homeEn'])->name('home');

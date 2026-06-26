@@ -3,7 +3,17 @@
 @section('description', $locale === 'en' ? 'Talk to Business Diversity about your human capital and organisational challenges.' : 'Fale com a Business Diversity sobre os seus desafios de capital humano e organização.')
 
 @section('content')
-@php($en = $locale === 'en')
+@php
+    $en = $locale === 'en';
+    $diagnostic = request('diagnostico');
+    $selectedService = request('service') ?? request('subject');
+    $serviceLabel = $selectedService ?: ($en ? 'this service' : 'este serviço');
+    $diagnosticMessage = $diagnostic
+        ? ($en
+            ? "Hello BD,\n\nI completed the quick diagnostic for {$serviceLabel} and the result was: {$diagnostic}.\n\nI would like to discuss the next steps."
+            : "Olá BD,\n\nFiz o diagnóstico rápido para {$serviceLabel} e o resultado foi: {$diagnostic}.\n\nGostaria de discutir os próximos passos.")
+        : '';
+@endphp
 <section class="page-hero inner-hero inner-hero-contact"><div class="container inner-hero-grid">
     <div class="inner-hero-copy"><span class="eyebrow light">{{ $en ? 'START HERE' : 'COMECE AQUI' }}</span><h1>{{ $en ? 'Your next people decision can start with one conversation.' : 'A sua próxima decisão sobre pessoas pode começar com uma conversa.' }}</h1><p>{{ $en ? 'Choose the easiest way to reach us. We are ready to understand the challenge.' : 'Escolha a forma mais simples de falar connosco. Estamos prontos para compreender o desafio.' }}</p></div>
     <div class="inner-hero-cards contact-actions">
@@ -28,7 +38,7 @@
         <div class="field-row"><label><span>{{ $en ? 'Name' : 'Nome' }} *</span><input name="name" value="{{ old('name') }}" required autocomplete="name" @class(['invalid' => $errors->has('name')])>@error('name')<small>{{ $message }}</small>@enderror</label><label><span>Email *</span><input type="email" name="email" value="{{ old('email') }}" required autocomplete="email" @class(['invalid' => $errors->has('email')])>@error('email')<small>{{ $message }}</small>@enderror</label></div>
         <div class="field-row"><label><span>{{ $en ? 'Phone' : 'Telefone' }}</span><input name="phone" value="{{ old('phone') }}" autocomplete="tel"></label><label><span>{{ $en ? 'Company' : 'Empresa' }}</span><input name="company" value="{{ old('company') }}" autocomplete="organization"></label></div>
         <label><span>{{ $en ? 'Subject' : 'Assunto' }} *</span><input name="subject" value="{{ old('subject', request('subject') ?? request('service')) }}" required @class(['invalid' => $errors->has('subject')])>@error('subject')<small>{{ $message }}</small>@enderror</label>
-        <label><span>{{ $en ? 'How can we help?' : 'Como podemos ajudar?' }} *</span><textarea name="message" rows="6" required @class(['invalid' => $errors->has('message')])>{{ old('message') }}</textarea>@error('message')<small>{{ $message }}</small>@enderror</label>
+        <label><span>{{ $en ? 'How can we help?' : 'Como podemos ajudar?' }} *</span><textarea name="message" rows="6" required @class(['invalid' => $errors->has('message')])>{{ old('message', $diagnosticMessage) }}</textarea>@error('message')<small>{{ $message }}</small>@enderror</label>
         <button class="button button-primary" type="submit">{{ $en ? 'Send message' : 'Enviar mensagem' }} →</button>
     </form>
 </div></div></section>

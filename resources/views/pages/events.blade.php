@@ -3,7 +3,9 @@
 @section('description', $locale === 'en' ? 'Business Diversity events, workshops and professional training.' : 'Eventos, workshops e formações profissionais da Business Diversity.')
 
 @section('content')
-@php($en = $locale === 'en')
+@php
+    $en = $locale === 'en';
+@endphp
 <section class="page-hero inner-hero inner-hero-events"><div class="container inner-hero-grid">
     <div class="inner-hero-copy"><span class="eyebrow light">{{ $en ? 'EVENTS & LEARNING' : 'EVENTOS E APRENDIZAGEM' }}</span><h1>{{ $en ? 'Learning designed to change how work gets done.' : 'Aprendizagem desenhada para transformar a forma de trabalhar.' }}</h1><p>{{ $en ? 'Practical experiences built around real organisational challenges.' : 'Experiências práticas construídas em torno de desafios reais das organizações.' }}</p></div>
     <div class="inner-hero-cards learning-formats">

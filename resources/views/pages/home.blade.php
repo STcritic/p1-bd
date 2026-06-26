@@ -4,7 +4,9 @@
 @section('description', $locale === 'en' ? 'Strategic human resources, recruitment and organisational development solutions in Mozambique.' : 'Soluções estratégicas de recursos humanos, recrutamento e desenvolvimento organizacional em Moçambique.')
 
 @section('content')
-@php($en = $locale === 'en')
+@php
+    $en = $locale === 'en';
+@endphp
 <section class="hero hero-premium">
     <div class="hero-media"><img src="{{ asset('assets/images/hero-consulting-team.png') }}" alt="{{ $en ? 'African business leaders in a strategic consulting session' : 'Líderes empresariais africanos numa sessão de consultoria estratégica' }}"></div>
     <div class="hero-overlay"></div>

@@ -1,3 +1,5 @@
+import '../css/app.css';
+
 const root = document.documentElement;
 const toggle = document.querySelector('[data-menu-toggle]');
 const menu = document.querySelector('[data-menu]');
@@ -43,8 +45,10 @@ const revealSelectors = [
     '.method-card', '.leadership-card',
     '.inner-hero-copy', '.inner-data-card', '.inner-principle-card', '.expertise-chip',
     '.learning-formats > article', '.contact-actions > a',
-    '.resource-teaser-card', '.guide-cover-card', '.guide-panel', '.guide-checklist label',
-    '.guide-deliverable-grid > div', '.guide-next-step',
+    '.insight-copy > *', '.insight-benefits > div', '.insight-panel-head',
+    '.resource-teaser-card', '.guide-cover-card', '.guide-panel', '.guide-check-item',
+    '.guide-brief-grid > article', '.guide-roadmap-grid > article', '.guide-diagnostic-summary',
+    '.guide-deliverable-grid > div', '.guide-question-grid > article', '.guide-next-step',
 ];
 
 document.querySelectorAll(revealSelectors.join(',')).forEach((element, index) => {
@@ -92,7 +96,7 @@ const counterObserver = new IntersectionObserver((entries, observer) => {
 
 document.querySelectorAll('.values-grid strong, .hero-proof strong').forEach((counter) => counterObserver.observe(counter));
 
-const interactiveCards = document.querySelectorAll('.service-card, .team-card, .purpose-grid article, .capability-card, .method-card, .metric-tile, .services-list article, .inner-data-card, .inner-principle-card, .expertise-chip, .learning-formats > article, .resource-teaser-card');
+const interactiveCards = document.querySelectorAll('.service-card, .team-card, .purpose-grid article, .capability-card, .method-card, .metric-tile, .services-list article, .inner-data-card, .inner-principle-card, .expertise-chip, .learning-formats > article, .insight-benefits > div, .resource-teaser-card, .guide-brief-grid > article, .guide-roadmap-grid > article, .guide-question-grid > article, .guide-check-item');
 
 if (!reduceMotion && window.matchMedia('(pointer: fine)').matches) {
     interactiveCards.forEach((card) => {
@@ -174,6 +178,102 @@ updateScrollEffects();
 
 document.querySelectorAll('[data-print-guide]').forEach((button) => {
     button.addEventListener('click', () => window.print());
+});
+
+const announcementModal = document.querySelector('[data-announcement-modal]');
+if (announcementModal) {
+    const storageKey = announcementModal.dataset.announcementKey;
+    const showOnce = announcementModal.dataset.showOnce === '1';
+    const closeButtons = announcementModal.querySelectorAll('[data-announcement-close]');
+    const videos = announcementModal.querySelectorAll('video');
+
+    const wasSeen = () => {
+        if (!showOnce || !storageKey) return false;
+        try {
+            return window.sessionStorage.getItem(storageKey) === 'closed';
+        } catch {
+            return false;
+        }
+    };
+
+    const markSeen = () => {
+        if (!showOnce || !storageKey) return;
+        try {
+            window.sessionStorage.setItem(storageKey, 'closed');
+        } catch {
+            // Browsers may block storage in private contexts; closing should still work.
+        }
+    };
+
+    const openAnnouncement = () => {
+        if (wasSeen()) return;
+        announcementModal.hidden = false;
+        document.body.classList.add('announcement-modal-open');
+    };
+
+    const closeAnnouncement = () => {
+        announcementModal.hidden = true;
+        document.body.classList.remove('announcement-modal-open');
+        markSeen();
+        videos.forEach((video) => video.pause());
+    };
+
+    closeButtons.forEach((button) => button.addEventListener('click', closeAnnouncement));
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !announcementModal.hidden) {
+            closeAnnouncement();
+        }
+    });
+    window.setTimeout(openAnnouncement, 450);
+}
+
+document.querySelectorAll('[data-diagnostic]').forEach((diagnostic) => {
+    const checks = [...diagnostic.querySelectorAll('[data-diagnostic-check]')];
+    const countEl = diagnostic.querySelector('[data-diagnostic-count]');
+    const meterEl = diagnostic.querySelector('[data-diagnostic-meter]');
+    const titleEl = diagnostic.querySelector('[data-diagnostic-title]');
+    const textEl = diagnostic.querySelector('[data-diagnostic-text]');
+    const contactLink = diagnostic.querySelector('[data-diagnostic-contact]');
+    const baseContactHref = contactLink?.getAttribute('href') || '';
+
+    const getState = (checked, total) => {
+        if (checked === 0) return 'empty';
+        if (checked <= Math.max(1, Math.floor(total * .25))) return 'low';
+        if (checked <= Math.max(2, Math.ceil(total * .5))) return 'medium';
+        return 'high';
+    };
+
+    const updateDiagnostic = () => {
+        const total = checks.length || 1;
+        const checked = checks.filter((check) => check.checked).length;
+        const state = getState(checked, total);
+        const percent = Math.round((checked / total) * 100);
+
+        diagnostic.classList.remove('is-empty', 'is-low', 'is-medium', 'is-high');
+        diagnostic.classList.add(`is-${state}`);
+
+        checks.forEach((check) => {
+            check.closest('.guide-check-item')?.classList.toggle('is-checked', check.checked);
+        });
+
+        if (countEl) countEl.textContent = String(checked);
+        if (meterEl) meterEl.style.width = `${percent}%`;
+        if (titleEl) titleEl.textContent = diagnostic.dataset[`${state}Title`] || '';
+        if (textEl) textEl.textContent = diagnostic.dataset[`${state}Text`] || '';
+
+        if (contactLink && baseContactHref) {
+            const contactUrl = new URL(baseContactHref, window.location.origin);
+            if (checked > 0) {
+                contactUrl.searchParams.set('diagnostico', `${checked}/${total} - ${diagnostic.dataset[`${state}Title`] || state}`);
+            } else {
+                contactUrl.searchParams.delete('diagnostico');
+            }
+            contactLink.href = contactUrl.pathname + contactUrl.search + contactUrl.hash;
+        }
+    };
+
+    checks.forEach((check) => check.addEventListener('change', updateDiagnostic));
+    updateDiagnostic();
 });
 
 const logoRow = document.querySelector('.logo-row');

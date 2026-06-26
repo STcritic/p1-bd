@@ -15,7 +15,7 @@
     <link rel="icon" href="{{ asset('favicon/favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon/apple-touch-icon.png') }}">
     <script>document.documentElement.classList.add('js')</script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite('resources/js/app.js')
     <script type="application/ld+json">{!! json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'ProfessionalService',
@@ -43,6 +43,9 @@
         : ($currentRoute === 'en.resource.show'
             ? route('resource.show', $currentGuide)
             : route($alternateRoute));
+    $siteAnnouncement = \Illuminate\Support\Facades\Schema::hasTable('announcements')
+        ? \App\Models\Announcement::query()->visible()->orderBy('priority')->latest()->first()
+        : null;
 @endphp
 <a class="skip-link" href="#main">{{ $isEnglish ? 'Skip to content' : 'Saltar para o conteúdo' }}</a>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
@@ -67,7 +70,7 @@
                 <a href="{{ route($routeName) }}" @class(['active' => request()->routeIs($routeName) || ($key === 'services' && request()->routeIs($isEnglish ? 'en.resource.show' : 'resource.show'))])>{{ __('site.nav.'.$key) }}</a>
             @endforeach
             <a class="language-link" href="{{ $alternateUrl }}" hreflang="{{ $isEnglish ? 'pt' : 'en' }}">{{ $isEnglish ? 'PT' : 'EN' }}</a>
-            <a class="button button-intranet" href="https://bdiversity.co.mz/intranet" aria-label="{{ __('site.nav.intranet') }}">{{ __('site.nav.intranet') }} <span aria-hidden="true">↗</span></a>
+            <a class="button button-intranet" href="{{ route('announcements.login') }}" aria-label="{{ __('site.nav.intranet') }}">{{ __('site.nav.intranet') }} <span aria-hidden="true">↗</span></a>
         </nav>
     </div>
 </header>
@@ -75,6 +78,51 @@
 <main id="main">
     @yield('content')
 </main>
+
+@if ($siteAnnouncement)
+    @php
+        $announcementMediaUrl = $siteAnnouncement->mediaUrl();
+        $announcementEmbedUrl = $siteAnnouncement->mediaEmbedUrl();
+    @endphp
+    <div class="site-announcement-modal"
+        data-announcement-modal
+        data-announcement-key="bd-announcement-{{ $siteAnnouncement->id }}-{{ $siteAnnouncement->updated_at?->timestamp }}"
+        data-show-once="{{ $siteAnnouncement->show_once_per_session ? '1' : '0' }}"
+        hidden>
+        <div class="site-announcement-backdrop" data-announcement-close></div>
+        <section class="site-announcement-card" role="dialog" aria-modal="true" aria-labelledby="site-announcement-title">
+            <button class="site-announcement-close" type="button" data-announcement-close aria-label="{{ $isEnglish ? 'Close announcement' : 'Fechar anúncio' }}">×</button>
+            @if ($announcementMediaUrl)
+                <div class="site-announcement-media">
+                    @if ($siteAnnouncement->media_type === 'image')
+                        <img src="{{ $announcementMediaUrl }}" alt="">
+                    @elseif ($announcementEmbedUrl)
+                        <iframe src="{{ $announcementEmbedUrl }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    @else
+                        <a class="site-announcement-link-card" href="{{ $announcementMediaUrl }}" target="_blank" rel="noopener">
+                            <span>{{ $siteAnnouncement->mediaPlatform() }}</span>
+                            <strong>{{ $isEnglish ? 'Open external media' : 'Abrir media externo' }}</strong>
+                            <small>{{ $isEnglish ? 'Content is hosted outside this website.' : 'O conteúdo está alojado fora deste website.' }}</small>
+                        </a>
+                    @endif
+                </div>
+            @endif
+            <div class="site-announcement-copy">
+                <span class="eyebrow">{{ $isEnglish ? 'BD ANNOUNCEMENT' : 'ANÚNCIO BD' }}</span>
+                <h2 id="site-announcement-title">{{ $siteAnnouncement->title }}</h2>
+                @if ($siteAnnouncement->body)
+                    <p>{{ $siteAnnouncement->body }}</p>
+                @endif
+                <div class="site-announcement-actions">
+                    @if ($siteAnnouncement->button_label && $siteAnnouncement->button_url)
+                        <a class="button button-primary" href="{{ $siteAnnouncement->button_url }}">{{ $siteAnnouncement->button_label }} <span>↗</span></a>
+                    @endif
+                    <button class="text-link" type="button" data-announcement-close>{{ $isEnglish ? 'Continue to website' : 'Continuar no website' }} <span>→</span></button>
+                </div>
+            </div>
+        </section>
+    </div>
+@endif
 
 <div class="floating-actions" aria-label="{{ $isEnglish ? 'Quick actions' : 'Acções rápidas' }}">
     <a class="floating-whatsapp" href="https://wa.me/258876052013" target="_blank" rel="noopener" aria-label="WhatsApp">
@@ -98,7 +146,7 @@
         <div><h3>{{ $isEnglish ? 'Contact' : 'Contactos' }}</h3><a href="tel:+258876052013">+258 87 605 2013</a><a href="mailto:info@bdiversity.co.mz">info@bdiversity.co.mz</a><a href="https://maps.app.goo.gl/TPeqy9imfq2xwMyt7" target="_blank" rel="noopener">Rua da Mozal, Matola-Rio</a></div>
         <div><h3>{{ $isEnglish ? 'Connect' : 'Redes sociais' }}</h3><a href="https://bit.ly/LinkedInBDiversity" target="_blank" rel="noopener">LinkedIn ↗</a><a href="https://bit.ly/Business-Diversity-fb" target="_blank" rel="noopener">Facebook ↗</a><a href="https://wa.me/258876052013" target="_blank" rel="noopener">WhatsApp ↗</a></div>
     </div>
-    <div class="container footer-bottom"><span>© {{ date('Y') }} Business Diversity CE, SA.</span><a href="https://bdiversity.co.mz/intranet">{{ __('site.nav.intranet') }}</a></div>
+    <div class="container footer-bottom"><span>© {{ date('Y') }} Business Diversity CE, SA.</span><a href="{{ route('announcements.login') }}">{{ __('site.nav.intranet') }}</a></div>
 </footer>
 </body>
 </html>

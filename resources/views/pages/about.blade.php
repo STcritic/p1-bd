@@ -3,7 +3,9 @@
 @section('description', $locale === 'en' ? 'Meet Business Diversity, our purpose, values and consulting team.' : 'Conheça a Business Diversity, o nosso propósito, valores e equipa de consultoria.')
 
 @section('content')
-@php($en = $locale === 'en')
+@php
+    $en = $locale === 'en';
+@endphp
 <section class="page-hero inner-hero inner-hero-about"><div class="container inner-hero-grid">
     <div class="inner-hero-copy"><span class="eyebrow light">{{ $en ? 'ABOUT BUSINESS DIVERSITY' : 'SOBRE A BUSINESS DIVERSITY' }}</span><h1>{{ $en ? 'Local insight. Senior expertise. Practical results.' : 'Conhecimento local. Experiência sénior. Resultados práticos.' }}</h1><p>{{ $en ? 'For more than eight years, we have helped organisations grow through better people decisions.' : 'Há mais de oito anos ajudamos organizações a crescer através de melhores decisões sobre pessoas.' }}</p></div>
     <div class="inner-hero-cards credential-cards" aria-label="{{ $en ? 'Business Diversity credentials' : 'Credenciais da Business Diversity' }}">
