@@ -22,6 +22,14 @@ class EnsureAnnouncementAdmin
                 ->with('status', 'Entre para gerir os anúncios do site.');
         }
 
+        if ($admin->passwordExpired()) {
+            $request->session()->forget('announcement_admin_id');
+
+            return redirect()
+                ->route('announcements.password.expired')
+                ->with('status', 'A palavra-passe expirou. Solicite um link seguro de restauro por email.');
+        }
+
         view()->share('announcementAdmin', $admin);
 
         return $next($request);

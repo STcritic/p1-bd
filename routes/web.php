@@ -37,6 +37,14 @@ Route::get('/area-colaborador', [AnnouncementAuthController::class, 'showLogin']
 Route::post('/area-colaborador', [AnnouncementAuthController::class, 'login'])
     ->middleware('throttle:6,1')
     ->name('announcements.login.store');
+Route::get('/area-colaborador/restaurar-senha', [AnnouncementAuthController::class, 'showPasswordResetRequest'])->name('announcements.password.expired');
+Route::post('/area-colaborador/restaurar-senha', [AnnouncementAuthController::class, 'sendPasswordResetLink'])
+    ->middleware('throttle:6,1')
+    ->name('announcements.password.expired.store');
+Route::get('/area-colaborador/nova-senha/{token}', [AnnouncementAuthController::class, 'showPasswordResetForm'])->name('announcements.password.reset');
+Route::post('/area-colaborador/nova-senha', [AnnouncementAuthController::class, 'updatePasswordFromToken'])
+    ->middleware('throttle:6,1')
+    ->name('announcements.password.update');
 Route::post('/area-colaborador/sair', [AnnouncementAuthController::class, 'logout'])->name('announcements.logout');
 
 Route::prefix('area-colaborador/anuncios')

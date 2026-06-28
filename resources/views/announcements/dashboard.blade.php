@@ -10,6 +10,9 @@
         </div>
         <div class="announcement-admin-user">
             <span>{{ $admin->name }}</span>
+            @if ($admin->password_expires_at)
+                <span>Senha válida até {{ $admin->password_expires_at->format('d/m/Y') }}</span>
+            @endif
             <form method="POST" action="{{ route('announcements.logout') }}">@csrf<button type="submit">Sair</button></form>
         </div>
     </header>

@@ -23,6 +23,8 @@ class AnnouncementAdminController extends Controller
             'name' => $data['name'],
             'email' => strtolower($data['email']),
             'password' => $data['password'],
+            'password_changed_at' => now(),
+            'password_expires_at' => now()->addMonths((int) config('announcements.password_expires_months', 6)),
             'is_master' => false,
             'is_active' => true,
         ]);
