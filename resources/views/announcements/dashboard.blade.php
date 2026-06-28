@@ -1,14 +1,17 @@
 @extends('announcements.layout')
-@section('title', 'Gestão de anúncios')
+@section('title', 'Anúncios')
 
 @section('content')
 <main class="announcement-dashboard">
     <header class="announcement-admin-header">
         <div>
             <a class="announcement-admin-logo" href="{{ route('home') }}"><img src="{{ asset('assets/img/logo/logo.png') }}" alt="Business Diversity"></a>
-            <div><span class="eyebrow">GESTÃO DO WEBSITE</span><h1>Anúncios de abertura</h1></div>
+            <div><span class="eyebrow">PORTAL BD</span><h1>Anúncios de abertura</h1></div>
         </div>
         <div class="announcement-admin-user">
+            <a class="announcement-admin-link is-active" href="{{ route('announcements.dashboard') }}">Anúncios</a>
+            <a class="announcement-admin-link" href="{{ route('collaborator.events.index') }}">Eventos</a>
+            <a class="announcement-admin-link" href="{{ route('collaborator.schedule.index') }}">Agenda</a>
             <span>{{ $admin->name }}</span>
             @if ($admin->password_expires_at)
                 <span>Senha válida até {{ $admin->password_expires_at->format('d/m/Y') }}</span>

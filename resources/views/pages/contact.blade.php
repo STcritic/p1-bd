@@ -17,7 +17,7 @@
 <section class="page-hero inner-hero inner-hero-contact"><div class="container inner-hero-grid">
     <div class="inner-hero-copy"><span class="eyebrow light">{{ $en ? 'START HERE' : 'COMECE AQUI' }}</span><h1>{{ $en ? 'Your next people decision can start with one conversation.' : 'A sua próxima decisão sobre pessoas pode começar com uma conversa.' }}</h1><p>{{ $en ? 'Choose the easiest way to reach us. We are ready to understand the challenge.' : 'Escolha a forma mais simples de falar connosco. Estamos prontos para compreender o desafio.' }}</p></div>
     <div class="inner-hero-cards contact-actions">
-        <a href="https://calendly.com/shelzermanuel/30min" target="_blank" rel="noopener"><span>01</span><div><small>{{ $en ? '30-minute conversation' : 'Conversa de 30 minutos' }}</small><strong>{{ $en ? 'Schedule a meeting' : 'Agendar reunião' }}</strong></div><i>↗</i></a>
+        <a href="{{ route($en ? 'en.schedule.show' : 'schedule.show') }}"><span>01</span><div><small>{{ $en ? '30-minute conversation' : 'Conversa de 30 minutos' }}</small><strong>{{ $en ? 'Schedule a meeting' : 'Agendar reunião' }}</strong></div><i>→</i></a>
         <a href="https://wa.me/258876052013" target="_blank" rel="noopener"><span>02</span><div><small>{{ $en ? 'Direct channel' : 'Canal directo' }}</small><strong>WhatsApp</strong></div><i>↗</i></a>
         <a href="mailto:info@bdiversity.co.mz"><span>03</span><div><small>{{ $en ? 'Send your brief' : 'Envie o seu pedido' }}</small><strong>Email</strong></div><i>↗</i></a>
     </div>
@@ -27,7 +27,7 @@
     <div class="contact-method"><span>01</span><div><small>{{ $en ? 'Phone / WhatsApp' : 'Telefone / WhatsApp' }}</small><a href="https://wa.me/258876052013">+258 87 605 2013</a></div></div>
     <div class="contact-method"><span>02</span><div><small>Email</small><a href="mailto:info@bdiversity.co.mz">info@bdiversity.co.mz</a></div></div>
     <div class="contact-method"><span>03</span><div><small>{{ $en ? 'Office' : 'Escritório' }}</small><a href="https://maps.app.goo.gl/TPeqy9imfq2xwMyt7" target="_blank" rel="noopener">Rua da Mozal, Matola-Rio ↗</a></div></div>
-    <a class="arrow-link" href="https://calendly.com/shelzermanuel/30min" target="_blank" rel="noopener">{{ __('site.common.schedule') }} →</a>
+    <a class="arrow-link" href="{{ route($en ? 'en.schedule.show' : 'schedule.show') }}">{{ __('site.common.schedule') }} →</a>
 </div>
 <div class="form-panel">
     @if (session('status'))<div class="alert-success" role="status">{{ session('status') }}</div>@endif

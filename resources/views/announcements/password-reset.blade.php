@@ -14,7 +14,7 @@
         </div>
 
         <div class="bd-access-copy">
-            <span class="eyebrow">RESTAURO SEGURO</span>
+            <span class="eyebrow">RESTAURO DE ACESSO</span>
         </div>
 
         @if (session('status'))
@@ -28,7 +28,7 @@
         <form method="POST" action="{{ route('announcements.password.expired.store') }}" class="bd-access-form" autocomplete="off">
             @csrf
             <label>
-                <span>Email autorizado</span>
+                <span>Email</span>
                 <input
                     type="text"
                     inputmode="email"
@@ -40,11 +40,11 @@
                     spellcheck="false"
                     data-lpignore="true"
                     data-1p-ignore="true"
-                    placeholder="Email autorizado">
+                    placeholder="Email">
                 @error('bd_access_email')<small>{{ $message }}</small>@enderror
             </label>
 
-            <button class="button button-primary" type="submit">Enviar link seguro <span>→</span></button>
+            <button class="button button-primary" type="submit">Enviar link <span>→</span></button>
         </form>
 
         <div class="bd-access-meta">

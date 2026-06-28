@@ -33,16 +33,21 @@
         ? ['home' => 'en.home', 'about' => 'en.about', 'services' => 'en.services', 'events' => 'en.events', 'contact' => 'en.contact']
         : ['home' => 'home', 'about' => 'about', 'services' => 'services', 'events' => 'events', 'contact' => 'contact'];
     $alternate = $isEnglish
-        ? ['en.home' => 'home', 'en.about' => 'about', 'en.services' => 'services', 'en.events' => 'events', 'en.contact' => 'contact']
-        : ['home' => 'en.home', 'about' => 'en.about', 'services' => 'en.services', 'events' => 'en.events', 'contact' => 'en.contact'];
+        ? ['en.home' => 'home', 'en.about' => 'about', 'en.services' => 'services', 'en.events' => 'events', 'en.contact' => 'contact', 'en.schedule.show' => 'schedule.show']
+        : ['home' => 'en.home', 'about' => 'en.about', 'services' => 'en.services', 'events' => 'en.events', 'contact' => 'en.contact', 'schedule.show' => 'en.schedule.show'];
     $currentRoute = request()->route()?->getName();
     $currentGuide = request()->route('guide');
+    $currentEvent = request()->route('event');
     $alternateRoute = $alternate[$currentRoute] ?? ($isEnglish ? 'home' : 'en.home');
     $alternateUrl = $currentRoute === 'resource.show'
         ? route('en.resource.show', $currentGuide)
         : ($currentRoute === 'en.resource.show'
             ? route('resource.show', $currentGuide)
-            : route($alternateRoute));
+            : ($currentRoute === 'events.show'
+                ? route('en.events.show', $currentEvent)
+                : ($currentRoute === 'en.events.show'
+                    ? route('events.show', $currentEvent)
+                    : route($alternateRoute))));
     $siteAnnouncement = \Illuminate\Support\Facades\Schema::hasTable('announcements')
         ? \App\Models\Announcement::query()->visible()->orderBy('priority')->latest()->first()
         : null;
@@ -67,7 +72,7 @@
         </button>
         <nav id="site-menu" class="site-nav" aria-label="{{ $isEnglish ? 'Main navigation' : 'Navegação principal' }}" data-menu>
             @foreach ($routes as $key => $routeName)
-                <a href="{{ route($routeName) }}" @class(['active' => request()->routeIs($routeName) || ($key === 'services' && request()->routeIs($isEnglish ? 'en.resource.show' : 'resource.show'))])>{{ __('site.nav.'.$key) }}</a>
+                <a href="{{ route($routeName) }}" @class(['active' => request()->routeIs($routeName) || ($key === 'services' && request()->routeIs($isEnglish ? 'en.resource.show' : 'resource.show')) || ($key === 'events' && request()->routeIs($isEnglish ? 'en.events.show' : 'events.show'))])>{{ __('site.nav.'.$key) }}</a>
             @endforeach
             <a class="language-link" href="{{ $alternateUrl }}" hreflang="{{ $isEnglish ? 'pt' : 'en' }}">{{ $isEnglish ? 'PT' : 'EN' }}</a>
             <a class="button button-intranet" href="{{ route('announcements.login') }}" aria-label="{{ __('site.nav.intranet') }}">{{ __('site.nav.intranet') }} <span aria-hidden="true">↗</span></a>
@@ -135,7 +140,7 @@
 <section class="cta-band">
     <div class="container cta-band-inner">
         <div><span class="eyebrow light">{{ $isEnglish ? 'LET’S BUILD TOGETHER' : 'VAMOS CONSTRUIR JUNTOS' }}</span><h2>{{ $isEnglish ? 'Ready to strengthen your organisation?' : 'Pronto para fortalecer a sua organização?' }}</h2></div>
-        <a class="button button-light" href="https://calendly.com/shelzermanuel/30min" target="_blank" rel="noopener">{{ __('site.common.schedule') }} <span aria-hidden="true">↗</span></a>
+        <a class="button button-light" href="{{ route($isEnglish ? 'en.schedule.show' : 'schedule.show') }}">{{ __('site.common.schedule') }} <span aria-hidden="true">→</span></a>
     </div>
 </section>
 

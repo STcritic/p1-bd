@@ -19,7 +19,7 @@ class EnsureAnnouncementAdmin
 
             return redirect()
                 ->route('announcements.login')
-                ->with('status', 'Entre para gerir os anúncios do site.');
+                ->with('status', 'Entre para continuar.');
         }
 
         if ($admin->passwordExpired()) {
@@ -27,7 +27,7 @@ class EnsureAnnouncementAdmin
 
             return redirect()
                 ->route('announcements.password.expired')
-                ->with('status', 'A palavra-passe expirou. Solicite um link seguro de restauro por email.');
+                ->with('status', 'A palavra-passe expirou. Solicite um link de restauro por email.');
         }
 
         view()->share('announcementAdmin', $admin);

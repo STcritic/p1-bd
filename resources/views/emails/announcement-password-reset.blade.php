@@ -14,7 +14,7 @@
                         <td style="padding:34px 34px 18px;border-top:5px solid #1266c3;">
                             <div style="font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#1266c3;font-weight:700;">Business Diversity</div>
                             <h1 style="margin:18px 0 10px;font-size:30px;line-height:1.1;color:#10243a;">Restauro de acesso</h1>
-                            <p style="margin:0;color:#5c7084;font-size:16px;line-height:1.65;">Olá {{ $admin->name }}, foi solicitado um link para restaurar a palavra-passe da área de gestão de anúncios.</p>
+                            <p style="margin:0;color:#5c7084;font-size:16px;line-height:1.65;">Olá {{ $admin->name }}, use o botão abaixo para definir uma nova palavra-passe no Portal BD.</p>
                         </td>
                     </tr>
                     <tr>

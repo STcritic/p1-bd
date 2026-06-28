@@ -28,7 +28,7 @@
         <form method="POST" action="{{ route('announcements.login.store') }}" class="bd-access-form" autocomplete="off">
             @csrf
             <label>
-                <span>Email autorizado</span>
+                <span>Email</span>
                 <input
                     type="text"
                     inputmode="email"
@@ -40,7 +40,7 @@
                     spellcheck="false"
                     data-lpignore="true"
                     data-1p-ignore="true"
-                    placeholder="Email autorizado">
+                    placeholder="Email">
                 @error('bd_access_email')<small>{{ $message }}</small>@enderror
             </label>
             <label>

@@ -26,7 +26,7 @@
             <input type="hidden" name="token" value="{{ $token }}">
 
             <label>
-                <span>Email autorizado</span>
+                <span>Email</span>
                 <input
                     type="text"
                     inputmode="email"
@@ -38,7 +38,7 @@
                     spellcheck="false"
                     data-lpignore="true"
                     data-1p-ignore="true"
-                    placeholder="Email autorizado">
+                    placeholder="Email">
                 @error('email')<small>{{ $message }}</small>@enderror
             </label>
 

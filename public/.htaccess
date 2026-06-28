@@ -5,6 +5,15 @@
 
     RewriteEngine On
 
+    # Production canonical domain / HTTPS.
+    # These rules only affect the real domain and keep local Laragon URLs untouched.
+    RewriteCond %{HTTP_HOST} ^www\.bdiversity\.co\.mz$ [NC]
+    RewriteRule ^ https://bdiversity.co.mz%{REQUEST_URI} [L,R=301]
+
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} ^bdiversity\.co\.mz$ [NC]
+    RewriteRule ^ https://bdiversity.co.mz%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

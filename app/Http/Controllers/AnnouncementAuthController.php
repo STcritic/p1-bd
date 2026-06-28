@@ -48,7 +48,7 @@ class AnnouncementAuthController extends Controller
         if ($admin->passwordExpired()) {
             return redirect()
                 ->route('announcements.password.expired')
-                ->with('status', 'A palavra-passe expirou. Solicite um link seguro de restauro por email.');
+                ->with('status', 'A palavra-passe expirou. Solicite um link de restauro por email.');
         }
 
         $request->session()->regenerate();
@@ -119,7 +119,7 @@ class AnnouncementAuthController extends Controller
             }
         }
 
-        return back()->with('status', 'Se o email estiver autorizado, receberá um link de restauro válido por 60 minutos.');
+        return back()->with('status', 'Se existir uma conta para este email, receberá um link de restauro.');
     }
 
     public function showPasswordResetForm(Request $request, string $token): View
@@ -190,6 +190,6 @@ class AnnouncementAuthController extends Controller
         $request->session()->forget('announcement_admin_id');
         $request->session()->regenerateToken();
 
-        return redirect()->route('announcements.login')->with('status', 'Sessão terminada com segurança.');
+        return redirect()->route('announcements.login')->with('status', 'Sessão terminada.');
     }
 }
