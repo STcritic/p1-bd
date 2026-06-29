@@ -52,6 +52,8 @@ MAIL_USERNAME=no_reply@bdiversity.co.mz
 MAIL_PASSWORD=...
 MAIL_FROM_ADDRESS=no_reply@bdiversity.co.mz
 MAIL_FROM_NAME="Business Diversity"
+MAIL_REPLY_TO_ADDRESS=info@bdiversity.co.mz
+MAIL_REPLY_TO_NAME="Business Diversity"
 MAIL_CONTACT_TO=info@bdiversity.co.mz
 
 ANNOUNCEMENT_MASTER_EMAIL=info@bdiversity.co.mz
@@ -61,7 +63,18 @@ ANNOUNCEMENT_PASSWORD_EXPIRES_MONTHS=6
 
 Não publique passwords em repositórios, screenshots ou documentação.
 
+No cPanel, o nome da base de dados e do utilizador normalmente recebe prefixo da conta, por exemplo:
+
+```env
+DB_DATABASE=usuario_bd_site
+DB_USERNAME=usuario_bd_user
+```
+
+Use exactamente os nomes mostrados no cPanel em **MySQL Databases**.
+
 ## Instalação
+
+### Com Terminal/SSH no cPanel
 
 ```bash
 composer install --no-dev --optimize-autoloader
@@ -85,6 +98,48 @@ npm run build
 ```
 
 Depois envie também `public/build`.
+
+### Sem Terminal/SSH no cPanel
+
+Prepare localmente antes de compactar:
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci
+npm run build
+php artisan optimize:clear
+```
+
+Depois envie para o servidor:
+
+- `app/`
+- `bootstrap/`
+- `config/`
+- `database/`
+- `lang/`
+- `public/`
+- `resources/`
+- `routes/`
+- `storage/`
+- `vendor/`
+- `artisan`
+- `composer.json`
+- `composer.lock`
+- `.env`
+
+Não envie:
+
+- `node_modules/`
+- `.git/`
+- `.agents/`
+- `.codex/`
+- ficheiros antigos `.html` da versão estática, se o domínio apontar correctamente para `public/`
+
+Se não houver Terminal para correr migrations, crie as tabelas a partir de uma base migrada localmente ou peça ao alojamento para executar:
+
+```bash
+php artisan migrate --force
+```
 
 ## Permissões
 
