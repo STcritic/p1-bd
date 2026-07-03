@@ -12,6 +12,7 @@
             <a class="announcement-admin-link is-active" href="{{ route('announcements.dashboard') }}">Anúncios</a>
             <a class="announcement-admin-link" href="{{ route('collaborator.events.index') }}">Eventos</a>
             <a class="announcement-admin-link" href="{{ route('collaborator.schedule.index') }}">Agenda</a>
+            <a class="announcement-admin-link" href="{{ route('collaborator.proposals.index') }}">Propostas</a>
             <span>{{ $admin->name }}</span>
             @if ($admin->password_expires_at)
                 <span>Senha válida até {{ $admin->password_expires_at->format('d/m/Y') }}</span>

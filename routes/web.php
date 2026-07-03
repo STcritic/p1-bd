@@ -6,6 +6,7 @@ use App\Http\Controllers\AnnouncementAuthController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CollaboratorEventController;
+use App\Http\Controllers\CollaboratorProposalController;
 use App\Http\Controllers\CollaboratorScheduleController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\PageController;
@@ -102,6 +103,14 @@ Route::prefix('area-colaborador/agenda')
         Route::post('/bloqueios', [CollaboratorScheduleController::class, 'storeBlock'])->name('blocks.store');
         Route::delete('/bloqueios/{block}', [CollaboratorScheduleController::class, 'destroyBlock'])->name('blocks.destroy');
         Route::patch('/marcacoes/{appointment}', [CollaboratorScheduleController::class, 'updateAppointment'])->name('appointments.update');
+    });
+
+Route::prefix('area-colaborador/propostas')
+    ->name('collaborator.proposals.')
+    ->middleware('announcement.admin')
+    ->group(function (): void {
+        Route::get('/', [CollaboratorProposalController::class, 'index'])->name('index');
+        Route::post('/gerar', [CollaboratorProposalController::class, 'generate'])->name('generate');
     });
 
 Route::prefix('en')->name('en.')->group(function (): void {

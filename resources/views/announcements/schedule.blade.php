@@ -15,6 +15,7 @@
             <a class="announcement-admin-link" href="{{ route('announcements.dashboard') }}">Anúncios</a>
             <a class="announcement-admin-link" href="{{ route('collaborator.events.index') }}">Eventos</a>
             <a class="announcement-admin-link is-active" href="{{ route('collaborator.schedule.index') }}">Agenda</a>
+            <a class="announcement-admin-link" href="{{ route('collaborator.proposals.index') }}">Propostas</a>
             <span>{{ $admin->name }}</span>
             <form method="POST" action="{{ route('announcements.logout') }}">@csrf<button type="submit">Sair</button></form>
         </div>
