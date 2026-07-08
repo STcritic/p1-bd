@@ -109,8 +109,13 @@ Route::prefix('area-colaborador/propostas')
     ->name('collaborator.proposals.')
     ->middleware('announcement.admin')
     ->group(function (): void {
-        Route::get('/', [CollaboratorProposalController::class, 'index'])->name('index');
-        Route::post('/gerar', [CollaboratorProposalController::class, 'generate'])->name('generate');
+        Route::get('/',              [CollaboratorProposalController::class, 'index'])->name('index');
+        Route::post('/gerar',        [CollaboratorProposalController::class, 'generate'])->name('generate');
+        Route::get('/guardadas',           [CollaboratorProposalController::class, 'savedIndex'])->name('saved');
+        Route::get('/{proposal}/editar',   [CollaboratorProposalController::class, 'edit'])->name('edit');
+        Route::get('/{proposal}',          [CollaboratorProposalController::class, 'show'])->name('show');
+        Route::patch('/{proposal}/estado',  [CollaboratorProposalController::class, 'updateStatus'])->name('update-status');
+        Route::delete('/{proposal}', [CollaboratorProposalController::class, 'destroy'])->name('destroy');
     });
 
 Route::prefix('en')->name('en.')->group(function (): void {
