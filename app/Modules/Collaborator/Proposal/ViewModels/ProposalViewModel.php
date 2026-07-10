@@ -2,6 +2,7 @@
 
 namespace App\Modules\Collaborator\Proposal\ViewModels;
 
+use App\Models\Proposal;
 use App\Modules\Collaborator\Proposal\DTO\ProposalData;
 use App\Modules\Collaborator\Proposal\Services\FinancialCalculator;
 use App\Modules\Collaborator\Proposal\Support\TextCleaner;
@@ -14,6 +15,7 @@ class ProposalViewModel
         private readonly ProposalData      $proposal,
         private readonly array             $identity,
         private readonly FinancialCalculator $financial,
+        private readonly ?Proposal         $savedProposal = null,
     ) {}
 
     // ─── Proxy — transparent access to ProposalData properties ──────────────
@@ -38,6 +40,43 @@ class ProposalViewModel
     public function formattedValidUntil(): string
     {
         return Carbon::parse($this->proposal->validUntil)->format('d/m/Y');
+    }
+
+    public function savedProposal(): ?Proposal
+    {
+        return $this->savedProposal;
+    }
+
+    public function verificationCode(): string
+    {
+        return $this->savedProposal?->verification_code ?: $this->proposal->reference;
+    }
+
+    public function verificationUrl(): ?string
+    {
+        return $this->savedProposal?->verificationUrl();
+    }
+
+    public function verificationQrUrl(): ?string
+    {
+        return $this->savedProposal?->verificationQrUrl();
+    }
+
+    public function isVerificationAvailable(): bool
+    {
+        return filled($this->verificationUrl()) && filled($this->verificationQrUrl());
+    }
+
+    public function verificationStatusLabel(): string
+    {
+        return $this->savedProposal?->verificationStatusLabel() ?? 'Certificada';
+    }
+
+    public function certifiedAtFormatted(): string
+    {
+        $date = $this->savedProposal?->certified_at ?: now();
+
+        return Carbon::parse($date)->format('d/m/Y H:i');
     }
 
     // ─── Financial formatting ─────────────────────────────────────────────────

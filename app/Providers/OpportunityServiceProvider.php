@@ -14,6 +14,7 @@ use App\Modules\Collaborator\Opportunity\Workflow\WorkflowEngine;
 use App\Modules\Collaborator\Proposal\Builders\ProposalBuilder;
 use App\Modules\Collaborator\Proposal\Factories\ContentStrategyFactory;
 use App\Modules\Collaborator\Proposal\Services\ContentGeneratorService;
+use App\Services\WebsiteNotificationService;
 use Illuminate\Support\ServiceProvider;
 
 class OpportunityServiceProvider extends ServiceProvider
@@ -30,13 +31,15 @@ class OpportunityServiceProvider extends ServiceProvider
 
         $this->app->bind(CreateOpportunity::class,    fn () => new CreateOpportunity());
         $this->app->bind(SendDiagnosticSession::class, fn ($app) => new SendDiagnosticSession(
-            $app->make(WorkflowEngine::class)
+            $app->make(WorkflowEngine::class),
+            $app->make(WebsiteNotificationService::class),
         ));
         $this->app->bind(SubmitDiagnostic::class, fn ($app) => new SubmitDiagnostic(
             $app->make(WorkflowEngine::class),
             $app->make(ContextEngine::class),
             $app->make(DecisionEngine::class),
             $app->make(OcrService::class),
+            $app->make(WebsiteNotificationService::class),
         ));
 
         $this->app->bind(PreProposalBuilder::class, fn ($app) => new PreProposalBuilder(

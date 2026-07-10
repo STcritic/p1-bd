@@ -7,36 +7,17 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CollaboratorEventController;
 use App\Http\Controllers\CollaboratorOpportunityController;
+use App\Http\Controllers\CollaboratorLanguageController;
 use App\Http\Controllers\CollaboratorProposalController;
 use App\Http\Controllers\CollaboratorScheduleController;
 use App\Http\Controllers\DiagnosticPortalController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\ProposalVerificationController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/sitemap.xml', function () {
-    $urls = [
-        route('home'), route('about'), route('services'), route('events'), route('contact'),
-        route('en.home'), route('en.about'), route('en.services'), route('en.events'), route('en.contact'),
-        route('schedule.show'), route('en.schedule.show'),
-    ];
-
-    foreach (array_column(config('service_guides.pt', []), 'slug') as $slug) {
-        $urls[] = route('resource.show', $slug);
-        $urls[] = route('en.resource.show', $slug);
-    }
-
-    if (\Illuminate\Support\Facades\Schema::hasTable('company_events')) {
-        foreach (\App\Models\CompanyEvent::query()->active()->pluck('slug') as $slug) {
-            $urls[] = route('events.show', $slug);
-            $urls[] = route('en.events.show', $slug);
-        }
-    }
-
-    return response()
-        ->view('sitemap', compact('urls'))
-        ->header('Content-Type', 'application/xml');
-})->name('sitemap');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/sobre-nos', [PageController::class, 'about'])->name('about');
@@ -58,6 +39,11 @@ Route::get('/contactos', [PageController::class, 'contact'])->name('contact');
 Route::post('/contactos', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
+
+Route::get('/propostas/verificar/{token}', [ProposalVerificationController::class, 'show'])
+    ->name('proposals.verify');
+Route::get('/propostas/verificar/{token}/qr.svg', [ProposalVerificationController::class, 'qr'])
+    ->name('proposals.verify.qr');
 
 Route::get('/area-colaborador', [AnnouncementAuthController::class, 'showLogin'])->name('announcements.login');
 Route::post('/area-colaborador', [AnnouncementAuthController::class, 'login'])
@@ -121,11 +107,9 @@ Route::prefix('area-colaborador/propostas')
     });
 
 /* ── Collaborator language toggle ───────────────────────────────────────── */
-Route::post('/area-colaborador/idioma', function () {
-    $lang = request('lang', 'pt');
-    \Illuminate\Support\Facades\Session::put('collab_lang', in_array($lang, ['pt', 'en']) ? $lang : 'pt');
-    return back();
-})->middleware('announcement.admin')->name('collaborator.set-language');
+Route::post('/area-colaborador/idioma', CollaboratorLanguageController::class)
+    ->middleware('announcement.admin')
+    ->name('collaborator.set-language');
 
 /* ── Consulting Workflow — Opportunities (Collaborator) ─────────────────── */
 Route::prefix('area-colaborador/oportunidades')

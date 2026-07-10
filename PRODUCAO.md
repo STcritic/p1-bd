@@ -1,14 +1,24 @@
 # Produção — Business Diversity
 
-Guia curto para publicar o website Laravel em alojamento/cPanel.
+Guia curto para publicar este projecto Laravel em alojamento compartilhado/cPanel.
 
-## Requisitos
+## Estado actual do projecto
+
+- `.env` está preparado para produção.
+- `.env.dev` guarda a configuração local/desenvolvimento.
+- Assets já foram compilados em `public/build`.
+- Composer foi optimizado em modo produção com `--no-dev`.
+- Configuração, rotas, views e eventos foram cacheados.
+- As rotas já são compatíveis com `route:cache`.
+- O sistema de propostas inclui QR Code de verificação digital.
+
+## Requisitos do servidor
 
 - PHP 8.3+
-- Extensões PHP comuns do Laravel: `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `ctype`, `json`, `curl`, `fileinfo`
 - MySQL/MariaDB
-- Composer 2
-- Node.js apenas se o build for feito no servidor. Se não houver Node no servidor, faça `npm run build` localmente e envie a pasta `public/build`.
+- Extensões PHP: `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `ctype`, `json`, `curl`, `fileinfo`
+- Composer 2, se for instalar dependências no servidor
+- Node.js só é necessário se o build for feito no servidor. Se enviar `public/build`, não precisa.
 
 ## Regra principal de segurança
 
@@ -20,22 +30,14 @@ O domínio deve apontar para:
 
 Não aponte o domínio para a raiz do projecto. A raiz contém `.env`, `app/`, `vendor/`, `storage/` e outros ficheiros internos.
 
-## Variáveis do `.env`
+## Ficheiro `.env`
 
-No servidor:
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-Depois confirme no `.env`:
+O `.env` deste projecto já está preparado para produção. Antes de publicar, confirme apenas:
 
 ```env
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://bdiversity.co.mz
-APP_TIMEZONE=Africa/Maputo
 FORCE_HTTPS=true
 
 DB_CONNECTION=mysql
@@ -48,69 +50,17 @@ MAIL_MAILER=smtp
 MAIL_SCHEME=smtps
 MAIL_HOST=mail.bdiversity.co.mz
 MAIL_PORT=465
-MAIL_USERNAME=no_reply@bdiversity.co.mz
-MAIL_PASSWORD=...
+MAIL_EHLO_DOMAIN=bdiversity.co.mz
 MAIL_FROM_ADDRESS=no_reply@bdiversity.co.mz
-MAIL_FROM_NAME="Business Diversity"
 MAIL_REPLY_TO_ADDRESS=info@bdiversity.co.mz
-MAIL_REPLY_TO_NAME="Business Diversity"
 MAIL_CONTACT_TO=info@bdiversity.co.mz
-
-ANNOUNCEMENT_MASTER_EMAIL=info@bdiversity.co.mz
-ANNOUNCEMENT_MASTER_PASSWORD=...
-ANNOUNCEMENT_PASSWORD_EXPIRES_MONTHS=6
 ```
 
 Não publique passwords em repositórios, screenshots ou documentação.
 
-No cPanel, o nome da base de dados e do utilizador normalmente recebe prefixo da conta, por exemplo:
+## Upload para cPanel sem SSH
 
-```env
-DB_DATABASE=usuario_bd_site
-DB_USERNAME=usuario_bd_user
-```
-
-Use exactamente os nomes mostrados no cPanel em **MySQL Databases**.
-
-## Instalação
-
-### Com Terminal/SSH no cPanel
-
-```bash
-composer install --no-dev --optimize-autoloader
-php artisan migrate --force
-php artisan storage:link
-php artisan optimize
-```
-
-Se o servidor tiver Node:
-
-```bash
-npm ci
-npm run build
-```
-
-Se não tiver Node, faça localmente:
-
-```bash
-npm ci
-npm run build
-```
-
-Depois envie também `public/build`.
-
-### Sem Terminal/SSH no cPanel
-
-Prepare localmente antes de compactar:
-
-```bash
-composer install --no-dev --optimize-autoloader
-npm ci
-npm run build
-php artisan optimize:clear
-```
-
-Depois envie para o servidor:
+Envie estes itens:
 
 - `app/`
 - `bootstrap/`
@@ -122,10 +72,10 @@ Depois envie para o servidor:
 - `routes/`
 - `storage/`
 - `vendor/`
+- `.env`
 - `artisan`
 - `composer.json`
 - `composer.lock`
-- `.env`
 
 Não envie:
 
@@ -133,9 +83,40 @@ Não envie:
 - `.git/`
 - `.agents/`
 - `.codex/`
-- ficheiros antigos `.html` da versão estática, se o domínio apontar correctamente para `public/`
+- `.env.dev`
+- ficheiros antigos `.html`, se o domínio já aponta correctamente para `public/`
 
-Se não houver Terminal para correr migrations, crie as tabelas a partir de uma base migrada localmente ou peça ao alojamento para executar:
+## Upload para cPanel com SSH/Terminal
+
+Depois de enviar o projecto:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan storage:link
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+```
+
+Se alterar CSS/JS no servidor:
+
+```bash
+npm ci
+npm run build
+```
+
+## Base de dados
+
+No cPanel, confirme que:
+
+- a base MySQL existe;
+- o utilizador MySQL existe;
+- o utilizador foi associado à base com permissões;
+- os nomes no `.env` são exactamente os nomes mostrados no cPanel.
+
+Depois execute:
 
 ```bash
 php artisan migrate --force
@@ -143,7 +124,7 @@ php artisan migrate --force
 
 ## Permissões
 
-As pastas abaixo precisam de escrita pelo PHP:
+Estas pastas precisam de escrita pelo PHP:
 
 ```text
 storage/
@@ -152,22 +133,38 @@ bootstrap/cache/
 
 ## Verificações depois de publicar
 
+Teste:
+
 - `https://bdiversity.co.mz/up`
-- Página inicial
-- Área do Colaborador
-- Restauro de palavra-passe
-- Criação de anúncio
-- Criação de evento
-- Agenda e horários disponíveis
-- Envio de email
+- página inicial;
+- área do colaborador;
+- restauro de palavra-passe;
+- criação de anúncio;
+- criação de evento;
+- agenda e marcação de reunião;
+- envio de email;
+- geração de proposta;
+- QR Code de verificação da proposta.
+
+## QR Code das propostas
+
+O QR da proposta aponta para:
+
+```text
+https://bdiversity.co.mz/propostas/verificar/{token}
+```
+
+Essa página confirma se a proposta está certificada, expirada, revogada, sem efeito ou inválida.
 
 ## Depois de alterações futuras
 
-Sempre que alterar rotas, views, config ou assets:
+Sempre que alterar rotas, views, config, controllers ou assets:
 
 ```bash
 npm run build
 php artisan migrate --force
-php artisan optimize:clear
-php artisan optimize
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
 ```

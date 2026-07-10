@@ -67,6 +67,7 @@ class CollaboratorProposalController extends Controller
                 ->findOrFail($editProposalId);
 
             $saved->update($payload);
+            $saved->ensureVerification();
 
             return redirect()->route('collaborator.proposals.show', $saved);
         }
@@ -82,12 +83,15 @@ class CollaboratorProposalController extends Controller
             ->first(fn (Proposal $existing): bool => $existing->form_data == $validated);
 
         if ($duplicate) {
+            $duplicate->ensureVerification();
+
             return redirect()->route('collaborator.proposals.show', $duplicate);
         }
 
         $saved = Proposal::create($payload + [
             'status' => 'rascunho',
         ]);
+        $saved->ensureVerification();
 
         return redirect()->route('collaborator.proposals.show', $saved);
     }
@@ -137,10 +141,11 @@ class CollaboratorProposalController extends Controller
         abort_unless($service, 404);
 
         $generated = $this->action->execute($proposal->form_data, $service);
+        $proposal->ensureVerification();
 
         return view('announcements.proposals.show', [
             'admin'         => $admin,
-            'vm'            => new ProposalViewModel($generated, config('proposal_identity', []), new FinancialCalculator()),
+            'vm'            => new ProposalViewModel($generated, config('proposal_identity', []), new FinancialCalculator(), $proposal),
             'savedProposal' => $proposal,
         ]);
     }

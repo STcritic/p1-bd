@@ -49,9 +49,11 @@
                 : ($currentRoute === 'en.events.show'
                     ? route('events.show', $currentEvent)
                     : route($alternateRoute))));
-    $siteAnnouncement = \Illuminate\Support\Facades\Schema::hasTable('announcements')
+    $siteAnnouncement = request()->routeIs('proposals.verify*')
+        ? null
+        : (\Illuminate\Support\Facades\Schema::hasTable('announcements')
         ? \App\Models\Announcement::query()->visible()->orderBy('priority')->latest()->first()
-        : null;
+        : null);
 @endphp
 <a class="skip-link" href="#main">{{ $isEnglish ? 'Skip to content' : 'Saltar para o conteúdo' }}</a>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>

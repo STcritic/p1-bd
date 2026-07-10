@@ -157,7 +157,7 @@ final class PreProposalBuilder
         }
 
         $sectorPhrase = $sector ? "no sector de {$sector}" : 'num contexto organizacional exigente';
-        return "Compreendemos que {$client} opera {$sectorPhrase}, onde a qualidade das decisões de gestão de pessoas, a clareza dos processos e a estabilidade das equipas são factores críticos de competitividade. O desafio identificado exige uma resposta que vai além de um simples entregável — exige metodologia, experiência e parceria.";
+        return "Compreendemos que {$client} opera {$sectorPhrase}, onde a qualidade das decisões de gestão de pessoas, a clareza dos processos e a estabilidade das equipas são factores críticos de competitividade. O desafio identificado exige uma resposta que vai além de um simples entregável, exige metodologia, experiência e parceria.";
     }
 
     // ── Page 3 builders ───────────────────────────────────────────────────────
@@ -166,7 +166,7 @@ final class PreProposalBuilder
     {
         return $en
             ? "BD adopts an integrated consulting approach for {$service['title']}. We don't just deliver documents — we deliver solutions that work in the client's real context, with knowledge transfer and implementation support."
-            : "A BD adopta uma abordagem de consultoria integrada para {$service['title']}. Não entregamos apenas documentos — entregamos soluções que funcionam na realidade da organização cliente, com transferência de conhecimento e suporte à implementação.";
+            : "A BD adopta uma abordagem de consultoria integrada para {$service['title']}. Não entregamos apenas documentos, entregamos soluções que funcionam na realidade da organização cliente, com transferência de conhecimento e suporte à implementação.";
     }
 
     private function buildMethodologySteps(string $slug, bool $en = false): array
@@ -235,9 +235,9 @@ final class PreProposalBuilder
         }
 
         $base = [
-            ['icon' => '◈', 'label' => 'Especialização sectorial',  'text' => 'Conhecimento profundo do mercado moçambicano — comportamento, legislação e referências salariais.'],
+            ['icon' => '◈', 'label' => 'Especialização sectorial',  'text' => 'Conhecimento profundo do mercado moçambicano, comportamento, legislação e referências salariais.'],
             ['icon' => '◉', 'label' => 'Abordagem metodológica',    'text' => 'Processos estruturados e documentados, com entregáveis claros em cada etapa.'],
-            ['icon' => '●', 'label' => 'Parceria de longo prazo',   'text' => 'Não somos prestadores ocasionais — somos o parceiro estratégico de RH da sua organização.'],
+            ['icon' => '●', 'label' => 'Parceria de longo prazo',   'text' => 'Não somos prestadores ocasionais, somos o parceiro estratégico de RH da sua organização.'],
         ];
         if ($slug === 'recrutamento-seleccao') {
             $base[0] = ['icon' => '◈', 'label' => 'Rede de talentos activa', 'text' => 'Base de candidatos qualificados e rede de contactos profissionais activa no mercado local.'];
@@ -255,7 +255,7 @@ final class PreProposalBuilder
                 : 'The proposal will be led by BD\'s senior consulting team, with proven experience in people management and organisational consulting in Mozambique.';
         }
         return $names
-            ? "A proposta será conduzida pela equipa BD: {$names} — consultores com experiência comprovada em gestão de pessoas e consultoria organizacional em Moçambique."
+            ? "A proposta será conduzida pela equipa BD: {$names} e outros consultores com experiência comprovada em gestão de pessoas e consultoria organizacional em Moçambique."
             : 'A proposta será conduzida pela equipa de consultores sénior da BD, com experiência comprovada em gestão de pessoas e consultoria organizacional em Moçambique.';
     }
 
@@ -291,7 +291,7 @@ final class PreProposalBuilder
         $serviceTitle = $this->resolveService($slug, $en)['title'];
         return $en
             ? "To build a truly personalised proposal for {$clientName} — with realistic timelines, calibrated resources and adapted methodology — we need to understand the organisation's context better. For this, we have developed a digital diagnostic specific to {$serviceTitle}."
-            : "Para construir uma proposta verdadeiramente personalizada para {$clientName} — com timelines realistas, recursos calibrados e metodologia adaptada — precisamos de conhecer melhor o contexto da organização. Para isso, desenvolvemos um diagnóstico digital específico para {$serviceTitle}.";
+            : "Para construir uma proposta verdadeiramente personalizada para {$clientName} com timelines realistas, recursos calibrados e metodologia adaptada precisamos de conhecer melhor o contexto da organização. Para isso, desenvolvemos um diagnóstico digital específico para {$serviceTitle}.";
     }
 
     private function buildDiagnosticBenefits(string $slug, bool $en = false): array
