@@ -3,20 +3,7 @@
 
 @section('content')
 <main class="announcement-dashboard">
-    <header class="announcement-admin-header">
-        <div>
-            <a class="announcement-admin-logo" href="{{ route('home') }}"><img src="{{ asset('assets/img/logo/logo.png') }}" alt="Business Diversity"></a>
-            <div><span class="eyebrow">PORTAL BD</span><h1>Propostas guardadas</h1></div>
-        </div>
-        <div class="announcement-admin-user">
-            <a class="announcement-admin-link" href="{{ route('announcements.dashboard') }}">Anúncios</a>
-            <a class="announcement-admin-link" href="{{ route('collaborator.events.index') }}">Eventos</a>
-            <a class="announcement-admin-link" href="{{ route('collaborator.schedule.index') }}">Agenda</a>
-            <a class="announcement-admin-link is-active" href="{{ route('collaborator.proposals.index') }}">Propostas</a>
-            <span>{{ $admin->name }}</span>
-            <form method="POST" action="{{ route('announcements.logout') }}">@csrf<button type="submit">Sair</button></form>
-        </div>
-    </header>
+    @include('announcements.partials.nav', ['active' => 'propostas', 'pageTitle' => 'Propostas guardadas'])
 
     <div class="announcement-admin-shell">
         @if (session('success'))

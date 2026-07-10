@@ -6,20 +6,7 @@
     $availabilityRules = old('availability', $setting->availabilityRules());
 @endphp
 <main class="announcement-dashboard">
-    <header class="announcement-admin-header">
-        <div>
-            <a class="announcement-admin-logo" href="{{ route('home') }}"><img src="{{ asset('assets/img/logo/logo.png') }}" alt="Business Diversity"></a>
-            <div><span class="eyebrow">PORTAL BD</span><h1>Agenda</h1></div>
-        </div>
-        <div class="announcement-admin-user">
-            <a class="announcement-admin-link" href="{{ route('announcements.dashboard') }}">Anúncios</a>
-            <a class="announcement-admin-link" href="{{ route('collaborator.events.index') }}">Eventos</a>
-            <a class="announcement-admin-link is-active" href="{{ route('collaborator.schedule.index') }}">Agenda</a>
-            <a class="announcement-admin-link" href="{{ route('collaborator.proposals.index') }}">Propostas</a>
-            <span>{{ $admin->name }}</span>
-            <form method="POST" action="{{ route('announcements.logout') }}">@csrf<button type="submit">Sair</button></form>
-        </div>
-    </header>
+    @include('announcements.partials.nav', ['active' => 'agenda', 'pageTitle' => 'Agenda'])
 
     <div class="announcement-admin-shell">
         @if (session('status'))
@@ -129,7 +116,7 @@
                             <article>
                                 <div>
                                     <strong>{{ $block->title }}</strong>
-                                    <span>{{ $block->starts_at->timezone($setting->timezoneName())->format('d/m/Y H:i') }} — {{ $block->ends_at->timezone($setting->timezoneName())->format('d/m/Y H:i') }}</span>
+                                    <span>{{ $block->starts_at->timezone($setting->timezoneName())->format('d/m/Y H:i') }} a {{ $block->ends_at->timezone($setting->timezoneName())->format('d/m/Y H:i') }}</span>
                                     @if ($block->notes)<small>{{ $block->notes }}</small>@endif
                                 </div>
                                 @if ($admin->is_master)

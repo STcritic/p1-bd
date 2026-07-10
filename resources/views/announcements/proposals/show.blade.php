@@ -1,21 +1,26 @@
 @extends('announcements.layout')
-@section('title', isset($savedProposal) ? 'Proposta — ' . $savedProposal->client_name : 'Proposta gerada')
+@section('title', isset($savedProposal) ? 'Proposta: ' . $savedProposal->client_name : 'Proposta gerada')
 
 @section('content')
+@php $en = ($collabLang ?? 'pt') === 'en'; @endphp
 <main class="proposal-preview-shell">
     <div class="proposal-toolbar no-print">
         <div class="proposal-toolbar-nav">
-            <a href="{{ route('collaborator.proposals.index') }}">← Nova proposta</a>
-            <a href="{{ route('collaborator.proposals.saved') }}">Propostas guardadas</a>
+            <a href="{{ route('collaborator.proposals.index') }}">← {{ $en ? 'New proposal' : 'Nova proposta' }}</a>
+            <a href="{{ route('collaborator.proposals.saved') }}">{{ $en ? 'Saved proposals' : 'Propostas guardadas' }}</a>
         </div>
         @isset($savedProposal)
             <span class="proposal-status-badge proposal-status-{{ $savedProposal->statusColor() }}">{{ $savedProposal->statusLabel() }}</span>
             <span class="proposal-toolbar-ref">{{ $savedProposal->reference }}</span>
         @endisset
         @isset($savedProposal)
-            <a href="{{ route('collaborator.proposals.edit', $savedProposal) }}" class="proposal-edit-btn">Editar proposta</a>
+            <a href="{{ route('collaborator.proposals.edit', $savedProposal) }}" class="proposal-edit-btn">{{ $en ? 'Edit proposal' : 'Editar proposta' }}</a>
         @endisset
-        <button type="button" class="proposal-print-btn" onclick="window.print()">Guardar PDF / Imprimir</button>
+        <button type="button" class="proposal-print-btn"
+            data-download-pdf
+            data-pdf-reference="{{ $savedProposal->reference ?? ($vm->reference ?? 'proposta') }}">
+            {{ $en ? 'Download PDF' : 'Baixar PDF' }}
+        </button>
     </div>
 
     @isset($savedProposal)
@@ -26,7 +31,7 @@
         <form method="POST" action="{{ route('collaborator.proposals.update-status', $savedProposal) }}" class="proposal-followup-form">
             @csrf @method('PATCH')
             <label class="proposal-followup-field">
-                <span>Estado</span>
+                <span>{{ $en ? 'Status' : 'Estado' }}</span>
                 <select name="status">
                     @foreach (\App\Models\Proposal::statuses() as $key => $label)
                         <option value="{{ $key }}" @selected($savedProposal->status === $key)>{{ $label }}</option>
@@ -34,22 +39,22 @@
                 </select>
             </label>
             <label class="proposal-followup-field proposal-followup-notes">
-                <span>Notas de follow-up</span>
-                <textarea name="notes" rows="2" placeholder="Ex: reunião marcada para dia 10, cliente pediu revisão de preço…">{{ $savedProposal->notes }}</textarea>
+                <span>{{ $en ? 'Follow-up notes' : 'Notas de follow-up' }}</span>
+                <textarea name="notes" rows="2" placeholder="{{ $en ? 'E.g.: meeting scheduled for the 10th, client asked for price revision…' : 'Ex: reunião marcada para dia 10, cliente pediu revisão de preço…' }}">{{ $savedProposal->notes }}</textarea>
             </label>
             <div class="proposal-followup-actions">
-                <button type="submit" class="button button-secondary">Guardar estado</button>
+                <button type="submit" class="button button-secondary">{{ $en ? 'Save status' : 'Guardar estado' }}</button>
                 @if ($savedProposal->expires_at)
                     <span class="proposal-followup-expiry {{ $savedProposal->isExpired() ? 'is-expired' : '' }}">
-                        Válida até {{ $savedProposal->expires_at->format('d/m/Y') }}
+                        {{ $en ? 'Valid until' : 'Válida até' }} {{ $savedProposal->expires_at->format('d/m/Y') }}
                     </span>
                 @endif
             </div>
         </form>
         <form method="POST" action="{{ route('collaborator.proposals.destroy', $savedProposal) }}"
-              onsubmit="return confirm('Eliminar esta proposta permanentemente?')" class="proposal-followup-delete">
+              onsubmit="return confirm('{{ $en ? 'Permanently delete this proposal?' : 'Eliminar esta proposta permanentemente?' }}')" class="proposal-followup-delete">
             @csrf @method('DELETE')
-            <button type="submit">Eliminar proposta</button>
+            <button type="submit">{{ $en ? 'Delete proposal' : 'Eliminar proposta' }}</button>
         </form>
     </div>
     @endisset
@@ -78,4 +83,21 @@
         <x-proposal.pages.acceptance :vm="$vm" />
     </article>
 </main>
+<script>
+(function () {
+    const btn = document.querySelector('[data-download-pdf]');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var ref  = btn.dataset.pdfReference || 'proposta';
+        var prev = document.title;
+        document.title = ref;
+        function restore() {
+            document.title = prev;
+            window.removeEventListener('afterprint', restore);
+        }
+        window.addEventListener('afterprint', restore);
+        setTimeout(function () { window.print(); }, 60);
+    });
+}());
+</script>
 @endsection

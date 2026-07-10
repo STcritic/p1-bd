@@ -31,6 +31,7 @@ class EnsureAnnouncementAdmin
         }
 
         view()->share('announcementAdmin', $admin);
+        view()->share('collabLang', $request->session()->get('collab_lang', 'pt'));
 
         return $next($request);
     }

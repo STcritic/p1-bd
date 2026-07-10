@@ -1,9 +1,14 @@
 @props(['vm'])
-<x-proposal.page number="16" label="Equipa do projecto"
-    title="Perfis técnicos indicados para esta intervenção"
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="16"
+    :label="$en ? 'Project team' : 'Equipa do projecto'"
+    :title="$en ? 'Technical profiles indicated for this intervention' : 'Perfis técnicos indicados para esta intervenção'"
     variant="team">
     <div class="proposal-team-intro">
-        <p>A equipa proposta combina liderança técnica sénior, conhecimento de RH e competências modernas em digitalização, dados, comunicação e optimização de processos.</p>
+        <p>{{ $en
+            ? 'The proposed team combines senior technical leadership, HR knowledge and modern competencies in digitalisation, data, communication and process optimisation.'
+            : 'A equipa proposta combina liderança técnica sénior, conhecimento de RH e competências modernas em digitalização, dados, comunicação e optimização de processos.'
+        }}</p>
         <strong>{{ $vm->team }}</strong>
     </div>
     @if (!empty($vm->teamMembers))

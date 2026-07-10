@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CompanyEvent;
+use App\Services\WebsiteNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,7 @@ class EventRegistrationController extends Controller
         $remainingSeats = $event->remainingSeats();
         $status = $remainingSeats !== null && $requestedSeats > $remainingSeats ? 'waitlist' : 'pending';
 
-        $event->registrations()->create([
+        $registration = $event->registrations()->create([
             'name' => $data['name'],
             'email' => strtolower($data['email']),
             'phone' => $data['phone'] ?? null,
@@ -38,6 +39,8 @@ class EventRegistrationController extends Controller
             'notes' => $data['notes'] ?? null,
             'source' => 'website',
         ]);
+
+        app(WebsiteNotificationService::class)->eventRegistrationReceived($registration);
 
         return back()->with(
             'status',

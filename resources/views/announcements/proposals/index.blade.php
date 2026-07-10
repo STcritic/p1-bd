@@ -10,24 +10,34 @@
     $isEditing   = isset($editProposal);
 
     // Helper: old() → prefill → hardcoded default
-    $v = fn(string $k, mixed $d = null): mixed => old($k, $prefill[$k] ?? $d);
+    $v = function($k, $d = null) use ($prefill) { return old($k, $prefill[$k] ?? $d); };
 
-    $serviceQuestions = collect($services)->mapWithKeys(function ($service) use ($presets, $profiles) {
-        $preset = $presets['services'][$service['slug']] ?? [];
+    $commercialPolicyAll      = config('proposal_commercial_policy', []);
+    $recruitmentPolicyConfig  = $commercialPolicyAll['recrutamento-seleccao'] ?? [];
+    $policyBandsConfig        = $recruitmentPolicyConfig['bands'] ?? [];
+
+    $serviceQuestions = collect($services)->mapWithKeys(function ($service) use ($presets, $profiles, $commercialPolicyAll) {
+        $slug   = $service['slug'];
+        $preset = $presets['services'][$slug] ?? [];
+        $expenseTypes = $commercialPolicyAll['expense_types'][$slug]
+            ?? $commercialPolicyAll['expense_types']['_default']
+            ?? [];
 
         return [
-            $service['slug'] => [
-                'title'       => $service['title'],
-                'questions'   => $preset['questions']    ?? ($service['checklist']   ?? []),
-                'approaches'  => $preset['approaches']   ?? [],
-                'modules'     => $preset['modules']      ?? [],
-                'deliverables'=> $preset['deliverables'] ?? ($service['deliverables'] ?? []),
-                'profiles'    => collect($preset['profiles'] ?? [])
+            $slug => [
+                'title'          => $service['title'],
+                'questions'      => $preset['questions']    ?? ($service['checklist']   ?? []),
+                'approaches'     => $preset['approaches']   ?? [],
+                'modules'        => $preset['modules']      ?? [],
+                'deliverables'   => $preset['deliverables'] ?? ($service['deliverables'] ?? []),
+                'profiles'       => collect($preset['profiles'] ?? [])
                     ->map(fn ($key) => ['key' => $key, 'text' => $profiles[$key] ?? $key])
                     ->values()
                     ->all(),
-                'pricing' => $preset['pricing'] ?? [],
-                'scope'   => $service['value'] ?? $service['short'],
+                'pricing'        => $preset['pricing'] ?? [],
+                'scope'          => $service['value'] ?? $service['short'],
+                'expenseTypes'   => $expenseTypes,
+                'commercialPolicy' => $commercialPolicyAll[$slug] ?? [],
             ],
         ];
     });
@@ -38,6 +48,10 @@
         'selected_modules'     => $v('selected_modules',     []),
         'selected_deliverables'=> $v('selected_deliverables',[]),
         'selected_profiles'    => $v('selected_profiles',    []),
+        'expense_items'        => $v('expense_items', []),
+        'expenses'             => $v('expenses', 0),
+        'candidate_salary'     => $v('candidate_salary', 0),
+        'recruit_type'         => $v('recruit_type', 'standard'),
     ];
 
     $proposalBuilderData = [
@@ -57,15 +71,24 @@
             <a class="announcement-admin-logo" href="{{ route('home') }}"><img src="{{ asset('assets/img/logo/logo.png') }}" alt="Business Diversity"></a>
             <div><span class="eyebrow">PORTAL BD</span><h1>{{ $isEditing ? 'Editar proposta' : 'Gerador de propostas' }}</h1></div>
         </div>
-        <div class="announcement-admin-user">
+        <nav class="announcement-admin-user">
             <a class="announcement-admin-link" href="{{ route('announcements.dashboard') }}">Anúncios</a>
             <a class="announcement-admin-link" href="{{ route('collaborator.events.index') }}">Eventos</a>
             <a class="announcement-admin-link" href="{{ route('collaborator.schedule.index') }}">Agenda</a>
-            <a class="announcement-admin-link is-active" href="{{ route('collaborator.proposals.index') }}">Nova proposta</a>
-            <a class="announcement-admin-link" href="{{ route('collaborator.proposals.saved') }}">Guardadas@if($recentProposals->isNotEmpty()) <span class="proposal-count-badge">{{ $recentProposals->count() }}</span>@endif</a>
-            <span>{{ $admin->name }}</span>
+            <a class="announcement-admin-link is-active" href="{{ route('collaborator.proposals.index') }}">Propostas</a>
+            <a class="announcement-admin-link" href="{{ route('collaborator.opportunities.index') }}">Oportunidades</a>
+            <a class="announcement-admin-link" href="{{ route('collaborator.proposals.saved') }}">
+                Guardadas
+                @if($recentProposals->isNotEmpty())
+                    <span class="proposal-count-badge">{{ $recentProposals->count() }}</span>
+                @endif
+            </a>
+            <span>{{ $announcementAdmin->name }}</span>
+            @if($announcementAdmin->password_expires_at)
+                <span class="pw-expiry">Senha válida até {{ $announcementAdmin->password_expires_at->format('d/m/Y') }}</span>
+            @endif
             <form method="POST" action="{{ route('announcements.logout') }}">@csrf<button type="submit">Sair</button></form>
-        </div>
+        </nav>
     </header>
 
     <div class="announcement-admin-shell">
@@ -76,7 +99,7 @@
         @if ($isEditing)
             <div class="proposal-edit-notice">
                 <div>
-                    <strong>A editar:</strong> {{ $editProposal->reference }} — {{ $editProposal->client_name }}
+                    <strong>A editar:</strong> {{ $editProposal->reference }}: {{ $editProposal->client_name }}
                     <span class="proposal-status-badge proposal-status-{{ $editProposal->statusColor() }}">{{ $editProposal->statusLabel() }}</span>
                 </div>
                 <a href="{{ route('collaborator.proposals.show', $editProposal) }}" class="proposal-edit-back">← Ver proposta actual</a>
@@ -84,7 +107,7 @@
         @endif
 
         <div data-draft-notice class="proposal-draft-notice" hidden>
-            <p>Rascunho recuperado: <strong data-draft-client></strong> — guardado em <strong data-draft-time></strong>.</p>
+            <p>Rascunho recuperado: <strong data-draft-client></strong>, guardado em <strong data-draft-time></strong>.</p>
             <div class="proposal-draft-actions">
                 <button type="button" data-draft-restore>Restaurar</button>
                 <button type="button" data-draft-clear>Descartar</button>
@@ -120,7 +143,7 @@
                     </select>@error('pricing_package')<small>{{ $message }}</small>@enderror</label>
                     <label><span>Complexidade *</span><select name="complexity_level" required data-proposal-complexity>
                         @foreach ($complexity as $key => $label)
-                            <option value="{{ $key }}" @selected($v('complexity_level', 'media') === $key)>{{ \Illuminate\Support\Str::before($label, ' —') }}</option>
+                            <option value="{{ $key }}" @selected($v('complexity_level', 'media') === $key)>{{ \Illuminate\Support\Str::before($label, ':') }}</option>
                         @endforeach
                     </select>@error('complexity_level')<small>{{ $message }}</small>@enderror</label>
                 </div>
@@ -215,11 +238,115 @@
 
                 <div class="field-row">
                     <label><span>Moeda</span><input name="currency" value="{{ $v('currency', $defaults['currency']) }}" required>@error('currency')<small>{{ $message }}</small>@enderror</label>
-                    <label><span>Honorários</span><input type="number" min="0" step="0.01" name="fee" value="{{ $v('fee') }}" placeholder="0.00">@error('fee')<small>{{ $message }}</small>@enderror</label>
+                    <label><span>Honorários</span><input type="number" min="0" step="0.01" name="fee" value="{{ $v('fee') }}" placeholder="0.00" data-fee-input>@error('fee')<small>{{ $message }}</small>@enderror</label>
+                </div>
+
+                {{-- Calculadora de honorários de recrutamento (mostrada via JS) --}}
+                <div class="proposal-salary-calc" data-salary-calc hidden>
+                    <div class="proposal-salary-calc-head">
+                        <span>Recrutamento e Selecção: referências de honorários</span>
+                        <small>Fee calculado sobre o salário anual bruto do candidato seleccionado</small>
+                    </div>
+                    <div class="proposal-recruit-type-row">
+                        <label class="proposal-recruit-type-option">
+                            <input type="radio" name="recruit_type" value="standard"
+                                {{ $v('recruit_type', 'standard') === 'standard' ? 'checked' : '' }}>
+                            <span>Recrutamento padrão</span>
+                            <small>4–6 semanas · 10–15% fee</small>
+                        </label>
+                        <label class="proposal-recruit-type-option">
+                            <input type="radio" name="recruit_type" value="headhunting"
+                                {{ $v('recruit_type', 'standard') === 'headhunting' ? 'checked' : '' }}>
+                            <span>Headhunting / Executivo</span>
+                            <small>8–12 semanas · 17.5–25% fee negociado</small>
+                        </label>
+                    </div>
+                    <div class="proposal-inep-notice" data-inep-notice>
+                        <strong>INEP</strong>
+                        <p>A Lei do Trabalho (Lei n.º 23/2007) obriga o empregador a notificar o INEP com mínimo <strong>7 dias úteis</strong> antes do início do processo. A BD inclui este requisito nas premissas da proposta.</p>
+                    </div>
+                    <div class="field-row" data-salary-row>
+                        <label>
+                            <span>Salário anual estimado do candidato</span>
+                            <input type="number" min="0" step="1000" name="candidate_salary"
+                                value="{{ $v('candidate_salary') }}" placeholder="0.00"
+                                data-candidate-salary>
+                            @error('candidate_salary')<small>{{ $message }}</small>@enderror
+                        </label>
+                        <div class="proposal-salary-calc-result" data-salary-result>
+                            <span>Referência de honorários</span>
+                            <strong data-salary-band-label>—</strong>
+                            <em data-salary-fee-preview></em>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Editor de política comercial de recrutamento (mostrado via JS) --}}
+                <details class="proposal-policy-editor" data-policy-editor hidden>
+                    <summary>
+                        <strong>Ajustar política comercial desta proposta</strong>
+                        <span>Pré-preenchido com os valores padrão. Altere apenas para este projecto.</span>
+                    </summary>
+                    <div class="proposal-policy-editor-inner">
+                        <p class="proposal-policy-editor-note">
+                            <strong>Modelo:</strong> {{ $recruitmentPolicyConfig['model_label'] ?? 'Fee sobre salário anual bruto' }}.
+                            Para alterar os defaults globais, edite <code>config/proposal_commercial_policy.php</code>.
+                        </p>
+                        <table class="proposal-policy-editor-table">
+                            <thead>
+                                <tr><th>Faixa</th><th>Fee (%)</th><th>Garantia (dias)</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($policyBandsConfig as $i => $band)
+                                    <tr>
+                                        <td>{{ $band['label'] }}</td>
+                                        @if (isset($band['rate']))
+                                            <td><input type="number" name="policy_band_{{ $i }}_rate" min="0" max="100" step="0.5"
+                                                value="{{ $v('policy_band_'.$i.'_rate', $band['rate']) }}"
+                                                class="proposal-policy-rate-input"></td>
+                                        @else
+                                            <td class="proposal-policy-range-cell">
+                                                <input type="number" name="policy_band_{{ $i }}_rate_min" min="0" max="100" step="0.5"
+                                                    value="{{ $v('policy_band_'.$i.'_rate_min', $band['rate_min'] ?? '') }}"
+                                                    class="proposal-policy-rate-input" placeholder="mín">
+                                                <span>–</span>
+                                                <input type="number" name="policy_band_{{ $i }}_rate_max" min="0" max="100" step="0.5"
+                                                    value="{{ $v('policy_band_'.$i.'_rate_max', $band['rate_max'] ?? '') }}"
+                                                    class="proposal-policy-rate-input" placeholder="máx">
+                                            </td>
+                                        @endif
+                                        <td><input type="number" name="policy_band_{{ $i }}_days" min="0" step="1"
+                                            value="{{ $v('policy_band_'.$i.'_days', $band['guarantee_days'] ?? '') }}"
+                                            class="proposal-policy-days-input"></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <label>
+                            <span>Nota sobre recrutamento massivo</span>
+                            <input name="policy_mass_note"
+                                value="{{ $v('policy_mass_note', $recruitmentPolicyConfig['mass_note'] ?? '') }}">
+                        </label>
+                        <label>
+                            <span>Condição de garantia (texto)</span>
+                            <textarea name="policy_guarantee_note" rows="2">{{ $v('policy_guarantee_note', $recruitmentPolicyConfig['guarantee']['note'] ?? '') }}</textarea>
+                        </label>
+                    </div>
+                </details>
+
+                <div class="proposal-expenses-block" data-expenses-block>
+                    <div class="proposal-expenses-head">
+                        <span>Despesas adicionais</span>
+                        <small data-expenses-total-display></small>
+                    </div>
+                    <input type="hidden" name="expenses" data-expenses-total value="{{ $v('expenses', 0) }}">
+                    <div class="proposal-expense-rows" data-expense-rows></div>
+                    <button type="button" class="proposal-add-expense-btn" data-add-expense>+ Adicionar despesa</button>
+                    @error('expenses')<small class="field-error">{{ $message }}</small>@enderror
                 </div>
 
                 <div class="field-row">
-                    <label><span>Despesas estimadas</span><input type="number" min="0" step="0.01" name="expenses" value="{{ $v('expenses', 0) }}">@error('expenses')<small>{{ $message }}</small>@enderror</label>
+                    <div></div>
                     <label><span>IVA (%)</span><input type="number" min="0" max="100" step="0.01" name="vat_rate" value="{{ $v('vat_rate', $defaults['vat_rate']) }}">@error('vat_rate')<small>{{ $message }}</small>@enderror</label>
                 </div>
 

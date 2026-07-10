@@ -23,7 +23,8 @@
         'url' => config('app.url'),
         'telephone' => '+258876052013',
         'email' => 'info@bdiversity.co.mz',
-        'address' => ['@type' => 'PostalAddress', 'streetAddress' => 'Rua da Mozal, Matola-Rio', 'addressCountry' => 'MZ'],
+        'address' => ['@type' => 'PostalAddress', 'streetAddress' => 'Beleluane, Matola Rio', 'addressLocality' => 'Maputo', 'addressCountry' => 'MZ'],
+        'url' => 'https://www.bdiversity.co.mz',
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 </head>
 <body>
@@ -148,7 +149,7 @@
     <div class="container footer-grid">
         <div class="footer-brand"><img src="{{ asset('assets/img/logo/logo.png') }}" alt="Business Diversity"><p>{{ $isEnglish ? 'We help organisations focus on their core business while we strengthen people, processes and performance.' : 'Ajudamos organizações a concentrarem-se no seu negócio principal enquanto fortalecemos pessoas, processos e desempenho.' }}</p></div>
         <div><h3>{{ $isEnglish ? 'Navigate' : 'Navegar' }}</h3>@foreach ($routes as $key => $routeName)<a href="{{ route($routeName) }}">{{ __('site.nav.'.$key) }}</a>@endforeach</div>
-        <div><h3>{{ $isEnglish ? 'Contact' : 'Contactos' }}</h3><a href="tel:+258876052013">+258 87 605 2013</a><a href="mailto:info@bdiversity.co.mz">info@bdiversity.co.mz</a><a href="https://maps.app.goo.gl/TPeqy9imfq2xwMyt7" target="_blank" rel="noopener">Rua da Mozal, Matola-Rio</a></div>
+        <div><h3>{{ $isEnglish ? 'Contact' : 'Contactos' }}</h3><a href="tel:+258876052013">+258 87 605 2013</a><a href="mailto:info@bdiversity.co.mz">info@bdiversity.co.mz</a><a href="https://www.bdiversity.co.mz">www.bdiversity.co.mz</a><a href="https://maps.app.goo.gl/TPeqy9imfq2xwMyt7" target="_blank" rel="noopener">Beleluane, Matola Rio, Maputo</a></div>
         <div><h3>{{ $isEnglish ? 'Connect' : 'Redes sociais' }}</h3><a href="https://bit.ly/LinkedInBDiversity" target="_blank" rel="noopener">LinkedIn ↗</a><a href="https://bit.ly/Business-Diversity-fb" target="_blank" rel="noopener">Facebook ↗</a><a href="https://wa.me/258876052013" target="_blank" rel="noopener">WhatsApp ↗</a></div>
     </div>
     <div class="container footer-bottom"><span>© {{ date('Y') }} Business Diversity CE, SA.</span><a href="{{ route('announcements.login') }}">{{ __('site.nav.intranet') }}</a></div>

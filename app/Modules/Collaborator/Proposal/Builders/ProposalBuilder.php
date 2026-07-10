@@ -47,6 +47,55 @@ class ProposalBuilder
         $pricing        = $preset['pricing'] ?? [];
         $challenge      = TextCleaner::clean($data['challenge']);
 
+        $rawItems     = $data['expense_items'] ?? [];
+        $expenseItems = array_values(array_filter(
+            $rawItems,
+            fn ($item) => !empty($item['label']) || (float) ($item['amount'] ?? 0) > 0,
+        ));
+
+        $candidateSalary = isset($data['candidate_salary']) && $data['candidate_salary'] !== ''
+            ? (float) $data['candidate_salary']
+            : null;
+
+        $recruitType = in_array($data['recruit_type'] ?? '', ['standard', 'headhunting'])
+            ? $data['recruit_type']
+            : 'standard';
+
+        // Build effective recruitment policy: config defaults + per-proposal overrides
+        $policyConfig    = config("proposal_commercial_policy.{$slug}", []);
+        $effectiveBands  = [];
+        foreach ($policyConfig['bands'] ?? [] as $i => $band) {
+            $b = $band;
+            if (isset($band['rate'])) {
+                $rateKey = "policy_band_{$i}_rate";
+                if (isset($data[$rateKey]) && $data[$rateKey] !== '') {
+                    $b['rate'] = (float) $data[$rateKey];
+                }
+            } else {
+                if (isset($data["policy_band_{$i}_rate_min"]) && $data["policy_band_{$i}_rate_min"] !== '') {
+                    $b['rate_min'] = (float) $data["policy_band_{$i}_rate_min"];
+                }
+                if (isset($data["policy_band_{$i}_rate_max"]) && $data["policy_band_{$i}_rate_max"] !== '') {
+                    $b['rate_max'] = (float) $data["policy_band_{$i}_rate_max"];
+                }
+            }
+            $daysKey = "policy_band_{$i}_days";
+            if (isset($data[$daysKey]) && $data[$daysKey] !== '') {
+                $b['guarantee_days'] = (int) $data[$daysKey];
+            }
+            $effectiveBands[] = $b;
+        }
+        $recruitmentPolicy = $policyConfig;
+        if ($effectiveBands) {
+            $recruitmentPolicy['bands'] = $effectiveBands;
+        }
+        if (!empty($data['policy_mass_note'])) {
+            $recruitmentPolicy['mass_note'] = $data['policy_mass_note'];
+        }
+        if (!empty($data['policy_guarantee_note'])) {
+            $recruitmentPolicy['guarantee']['note'] = $data['policy_guarantee_note'];
+        }
+
         $fin = $this->financial->calculate(
             (float) ($data['fee']      ?? 0),
             (float) ($data['expenses'] ?? 0),
@@ -81,9 +130,9 @@ class ProposalBuilder
             scope:                $data['scope']       ?: $this->content->defaultScope($service, $selectedModules),
             methodology:          $data['methodology'] ?: $this->content->defaultMethodology($slug),
             deliverables:         $data['deliverables']?: implode("\n", $selectedDeliverables),
-            timeline:             $data['timeline']    ?: ($defaults['timeline']    ?? ''),
+            timeline:             $data['timeline']    ?: $this->defaultTimeline($slug, $recruitType, $defaults),
             team:                 $data['team']        ?: implode("\n", $selectedProfilesText),
-            assumptions:          $data['assumptions'] ?: ($defaults['assumptions'] ?? ''),
+            assumptions:          $this->buildAssumptions($slug, $data, $defaults),
             outOfScope:           $data['out_of_scope']?: ($defaults['out_of_scope']?? ''),
             currency:             $data['currency'],
             fee:                  $fin['fee'],
@@ -98,6 +147,10 @@ class ProposalBuilder
             pricingPackage:       $package,
             complexityLabel:      $complexityLabel,
             pricingPolicy:        $pricing,
+            expenseItems:         $expenseItems,
+            candidateSalary:      $candidateSalary,
+            recruitmentPolicy:    $recruitmentPolicy,
+            recruitType:          $recruitType,
             selectedApproaches:   $selectedApproaches,
             selectedModules:      $selectedModules,
             selectedDeliverables: $selectedDeliverables,
@@ -120,7 +173,31 @@ class ProposalBuilder
             nextSteps:            $this->content->nextSteps($slug),
             closingNote:          $this->content->closingNote($data, $service),
             roadmap:              $this->content->defaultRoadmap($slug, $selectedModules),
+            lang:                 $data['lang'] ?? 'pt',
         );
+    }
+
+    private function defaultTimeline(string $slug, string $recruitType, array $defaults): string
+    {
+        if ($slug === 'recrutamento-seleccao') {
+            return $recruitType === 'headhunting'
+                ? '8 a 12 semanas após adjudicação e definição do perfil executivo.'
+                : '4 a 6 semanas após adjudicação e alinhamento do perfil.';
+        }
+
+        return $defaults['timeline'] ?? '';
+    }
+
+    private function buildAssumptions(string $slug, array $data, array $defaults): string
+    {
+        $base = $data['assumptions'] ?: ($defaults['assumptions'] ?? '');
+
+        if ($slug === 'recrutamento-seleccao' && ! str_contains($base, 'INEP')) {
+            $inep = 'Comunicação prévia ao INEP: nos termos da Lei do Trabalho (Lei n.º 23/2007), o empregador deve notificar o Instituto Nacional do Emprego e Profissional com mínimo de 7 dias úteis antes do início do processo. Responsabilidade do cliente.';
+            $base = trim($inep . ($base !== '' ? "\n" . $base : ''));
+        }
+
+        return $base;
     }
 
     private function selectedFrom(array $options, ?array $selected): array

@@ -1,6 +1,8 @@
 @props(['vm'])
-<x-proposal.page number="01" label="Carta personalizada"
-    :title="'Preparada para a realidade da '.$vm->clientName"
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="01"
+    :label="$en ? 'Personalised letter' : 'Carta personalizada'"
+    :title="$en ? 'Prepared for the reality of '.$vm->clientName : 'Preparada para a realidade da '.$vm->clientName"
     variant="letter"
     :pageHead="$vm->clientName">
     <div class="proposal-letter-card">
@@ -15,7 +17,7 @@
         </div>
     </div>
     <div class="proposal-context-panel">
-        <span>Entendimento preliminar</span>
+        <span>{{ $en ? 'Preliminary understanding' : 'Entendimento preliminar' }}</span>
         <p>{{ $vm->contextualSummary }}</p>
     </div>
 </x-proposal.page>

@@ -39,6 +39,9 @@ class CollaboratorProposalController extends Controller
     public function generate(GenerateProposalRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $editProposalId = $validated['_edit_proposal_id'] ?? null;
+        unset($validated['_edit_proposal_id']);
+
         $services  = collect(config('service_guides.pt', []));
         $service   = $services->firstWhere('slug', $validated['service_slug']);
 
@@ -47,16 +50,43 @@ class CollaboratorProposalController extends Controller
         $admin    = $this->currentAdmin($request);
         $proposal = $this->action->execute($validated, $service);
 
-        $saved = Proposal::create([
+        $payload = [
             'announcement_admin_id' => $admin->id,
             'reference'             => $proposal->reference,
             'service_slug'          => $proposal->serviceSlug,
             'service_title'         => $proposal->serviceTitle,
             'client_name'           => $proposal->clientName,
             'client_contact'        => $proposal->clientContact,
-            'status'                => 'rascunho',
             'form_data'             => $validated,
             'expires_at'            => $proposal->validUntil ?: null,
+        ];
+
+        if ($editProposalId) {
+            $saved = Proposal::query()
+                ->where('announcement_admin_id', $admin->id)
+                ->findOrFail($editProposalId);
+
+            $saved->update($payload);
+
+            return redirect()->route('collaborator.proposals.show', $saved);
+        }
+
+        $duplicate = Proposal::query()
+            ->where('announcement_admin_id', $admin->id)
+            ->where('reference', $proposal->reference)
+            ->where('service_slug', $proposal->serviceSlug)
+            ->where('client_name', $proposal->clientName)
+            ->where('created_at', '>=', now()->subSeconds(30))
+            ->latest()
+            ->get()
+            ->first(fn (Proposal $existing): bool => $existing->form_data == $validated);
+
+        if ($duplicate) {
+            return redirect()->route('collaborator.proposals.show', $duplicate);
+        }
+
+        $saved = Proposal::create($payload + [
+            'status' => 'rascunho',
         ]);
 
         return redirect()->route('collaborator.proposals.show', $saved);

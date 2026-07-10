@@ -1,10 +1,12 @@
 @props(['vm'])
-<x-proposal.page number="02" label="Leitura do cliente"
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="02"
+    :label="$en ? 'Client reading' : 'Leitura do cliente'"
     :title="$vm->clientContext['title']"
     variant="client-context">
     <div class="proposal-client-context-hero">
         <div>
-            <span>O que entendemos</span>
+            <span>{{ $en ? 'What we understand' : 'O que entendemos' }}</span>
             <p>{{ $vm->clientContext['intro'] }}</p>
         </div>
         <strong>{{ $vm->clientContext['service_need'] }}</strong>

@@ -53,6 +53,10 @@ readonly class ProposalData
         public array   $pricingPackage,
         public string  $complexityLabel,
         public array   $pricingPolicy,
+        public array   $expenseItems,
+        public ?float  $candidateSalary,
+        public array   $recruitmentPolicy,
+        public string  $recruitType,
 
         // Selections
         public array   $selectedApproaches,
@@ -79,5 +83,8 @@ readonly class ProposalData
         public array   $nextSteps,
         public string  $closingNote,
         public array   $roadmap,
+
+        // Language
+        public string  $lang = 'pt',
     ) {}
 }

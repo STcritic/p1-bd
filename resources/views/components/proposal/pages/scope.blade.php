@@ -1,8 +1,11 @@
 @props(['vm'])
-<x-proposal.page number="06" label="Âmbito da proposta" title="Objectivos, escopo e entregáveis">
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="06"
+    :label="$en ? 'Proposal scope' : 'Âmbito da proposta'"
+    :title="$en ? 'Objectives, scope and deliverables' : 'Objectivos, escopo e entregáveis'">
     <div class="proposal-two-columns">
         <div class="proposal-block">
-            <h3>Objectivos da intervenção</h3>
+            <h3>{{ $en ? 'Intervention objectives' : 'Objectivos da intervenção' }}</h3>
             <ul>
                 @foreach ($vm->lines($vm->objectives) as $line)
                     <li>{{ $line }}</li>
@@ -10,7 +13,7 @@
             </ul>
         </div>
         <div class="proposal-block proposal-highlight">
-            <h3>Âmbito técnico</h3>
+            <h3>{{ $en ? 'Technical scope' : 'Âmbito técnico' }}</h3>
             <p>{!! nl2br(e($vm->scope)) !!}</p>
             @if (!empty($vm->selectedModules))
                 <div class="proposal-module-tags">
@@ -22,7 +25,7 @@
         </div>
     </div>
     <div class="proposal-block proposal-scope-deliverables">
-        <h3>Entregáveis principais</h3>
+        <h3>{{ $en ? 'Key deliverables' : 'Entregáveis principais' }}</h3>
         <ul class="proposal-deliverables-list">
             @foreach ($vm->lines($vm->deliverables) as $line)
                 <li>{{ $line }}</li>

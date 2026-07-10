@@ -3,21 +3,27 @@
     $credentials  = $vm->credentials();
     $hasCerts     = !empty($credentials['certifications']);
     $hasPartners  = !empty($credentials['partnerships']);
+    $hasMemberships = !empty($credentials['memberships']);
     $hasAwards    = !empty($credentials['awards']);
-    // Flat string array format (current config format)
-    $textItems    = collect($credentials)->filter(fn ($v) => is_string($v))->values();
+    $profileItems = collect($credentials['profile'] ?? []);
+    // Legacy: flat string array format
+    $textItems    = $profileItems->isNotEmpty()
+        ? $profileItems
+        : collect($credentials)->filter(fn ($v) => is_string($v))->values();
     $hasText      = $textItems->isNotEmpty();
-    $hasAny       = $hasCerts || $hasPartners || $hasAwards || $hasText;
+    $hasAny       = $hasCerts || $hasPartners || $hasMemberships || $hasAwards || $hasText;
+    $en           = $vm->lang() === 'en';
 @endphp
 @if ($hasAny)
-<x-proposal.page number="17" label="Credenciais e parcerias"
-    title="Certificações, parcerias e reconhecimentos"
+<x-proposal.page number="17"
+    :label="$en ? 'Credentials and partnerships' : 'Credenciais e parcerias'"
+    :title="$en ? 'Certifications, partnerships and recognitions' : 'Certificações, parcerias e reconhecimentos'"
     variant="certifications">
 
-    {{-- Flat text credentials (current config format) --}}
-    @if ($hasText && !$hasCerts && !$hasPartners && !$hasAwards)
+    {{-- Profile text --}}
+    @if ($hasText)
         <div class="proposal-block proposal-credentials-profile">
-            <h3>Perfil de credenciais e compromisso de qualidade</h3>
+            <h3>{{ $en ? 'Credentials profile and quality commitment' : 'Perfil de credenciais e compromisso de qualidade' }}</h3>
             <ul class="proposal-credential-text-list">
                 @foreach ($textItems as $item)
                     <li>{{ $item }}</li>
@@ -26,10 +32,30 @@
         </div>
     @endif
 
+    {{-- Memberships --}}
+    @if ($hasMemberships)
+        <div class="proposal-block">
+            <h3>{{ $en ? 'Memberships' : 'Membresías' }}</h3>
+            <div class="proposal-memberships-grid">
+                @foreach ($credentials['memberships'] as $member)
+                    <article class="proposal-membership-card">
+                        @if (!empty($member['logo']))
+                            <img src="{{ asset($member['logo']) }}" alt="{{ $member['name'] }}">
+                        @endif
+                        <div>
+                            <strong>{{ $member['name'] }}</strong>
+                            @if (!empty($member['type']))<span>{{ $member['type'] }}</span>@endif
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- Structured certifications --}}
     @if ($hasCerts)
         <div class="proposal-block">
-            <h3>Certificações activas</h3>
+            <h3>{{ $en ? 'Active certifications' : 'Certificações activas' }}</h3>
             <div class="proposal-certifications-grid">
                 @foreach ($credentials['certifications'] as $cert)
                     <article>
@@ -49,7 +75,7 @@
 
     @if ($hasPartners)
         <div class="proposal-block">
-            <h3>Parcerias estratégicas</h3>
+            <h3>{{ $en ? 'Strategic partnerships' : 'Parcerias estratégicas' }}</h3>
             <div class="proposal-partnerships-grid">
                 @foreach ($credentials['partnerships'] as $partner)
                     <article>
@@ -68,7 +94,7 @@
 
     @if ($hasAwards)
         <div class="proposal-block">
-            <h3>Prémios e reconhecimentos</h3>
+            <h3>{{ $en ? 'Awards and recognitions' : 'Prémios e reconhecimentos' }}</h3>
             <ul class="proposal-awards-list">
                 @foreach ($credentials['awards'] as $award)
                     <li>

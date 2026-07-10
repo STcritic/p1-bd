@@ -121,17 +121,7 @@ class ContentGeneratorService
 
     public function defaultFinancialNotes(array $package, string $complexity, array $pricing): string
     {
-        $notes = [
-            "Pacote seleccionado: {$package['label']} — {$package['description']}",
-            "Complexidade considerada: {$complexity}",
-            'Política de preço: '.($pricing['base'] ?? $package['pricing']),
-        ];
-
-        foreach (($pricing['drivers'] ?? []) as $driver) {
-            $notes[] = "Factor de preço: {$driver}";
-        }
-
-        return implode("\n", $notes);
+        return "{$package['label']}. Complexidade {$complexity}. " . ($pricing['base'] ?? $package['pricing'] ?? '');
     }
 
     public function defaultRoadmap(string $slug, array $modules): array

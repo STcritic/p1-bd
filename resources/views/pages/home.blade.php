@@ -111,9 +111,38 @@
     </div>
 </section>
 
-<section class="section clients-section premium-clients">
-    <div class="container"><div class="center-heading"><span class="eyebrow">{{ $en ? 'TRUSTED RELATIONSHIPS' : 'RELAÇÕES DE CONFIANÇA' }}</span><h2>{{ $en ? 'Partnership is how progress lasts.' : 'É através da parceria que o progresso permanece.' }}</h2></div><div class="logo-row">
-        @foreach (['client-01.png','client-02.png','client-03.jpg','client-04.jpg','client-05.jpg','client-06.png'] as $logo)<div><img src="{{ asset('assets/logo/patnersLogo/Clients/'.$logo) }}" alt="{{ $en ? 'Client logo' : 'Logótipo de cliente' }}" loading="lazy"></div>@endforeach
-    </div></div>
+<section class="section partners-section">
+    <div class="container">
+        <div class="center-heading">
+            <span class="eyebrow">{{ $en ? 'TRUSTED RELATIONSHIPS' : 'RELAÇÕES DE CONFIANÇA' }}</span>
+            <h2>{{ $en ? 'Some of our valued partners' : 'Alguns dos nossos estimados parceiros' }}</h2>
+        </div>
+
+        <div class="partners-grid">
+            @foreach (config('proposal_identity.clients', []) as $p)
+                <div class="partner-card">
+                    <img src="{{ asset($p['logo']) }}"
+                         alt="{{ $p['name'] }}" loading="lazy"
+                         onerror="this.style.display='none'">
+                    <span>{{ $p['name'] }}</span>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="membership-block">
+            <div class="membership-label">
+                <span class="eyebrow">{{ $en ? 'MEMBERSHIP' : 'MEMBRESIA' }}</span>
+            </div>
+            <div class="membership-card">
+                <img src="{{ asset('assets/logo/patnersLogo/Clients/ameprh.png') }}"
+                     alt="AMEPRH" loading="lazy"
+                     onerror="this.style.display='none'">
+                <div>
+                    <strong>AMEPRH</strong>
+                    <span>{{ $en ? 'Mozambican Association of HR Companies and Professionals' : 'Associação Moçambicana de Empresas e Profissionais de RH' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 @endsection

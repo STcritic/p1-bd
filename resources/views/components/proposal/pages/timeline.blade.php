@@ -1,5 +1,8 @@
 @props(['vm'])
-<x-proposal.page number="08" label="Cronograma visual" title="Plano de execução indicativo">
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="08"
+    :label="$en ? 'Visual timeline' : 'Cronograma visual'"
+    :title="$en ? 'Indicative execution plan' : 'Plano de execução indicativo'">
     <div class="proposal-timeline">
         @foreach ($vm->timelinePlan as $item)
             <article>

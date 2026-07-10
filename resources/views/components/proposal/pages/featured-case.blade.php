@@ -1,19 +1,20 @@
 @props(['vm'])
-@php $case = $vm->featuredCase; @endphp
+@php $case = $vm->featuredCase; $en = $vm->lang() === 'en'; @endphp
 @if (!empty($case))
-<x-proposal.page number="13" label="Caso de sucesso"
+<x-proposal.page number="13"
+    :label="$en ? 'Success case' : 'Caso de sucesso'"
     :title="$case['title']"
     variant="featured-case">
     <div class="proposal-featured-case">
         <div class="proposal-featured-case-main">
             <span>{{ $case['sector'] }}</span>
-            <h3>Desafio</h3>
+            <h3>{{ $en ? 'Challenge' : 'Desafio' }}</h3>
             <p>{{ $case['challenge'] }}</p>
-            <h3>Intervenção BD</h3>
+            <h3>{{ $en ? 'BD Intervention' : 'Intervenção BD' }}</h3>
             <p>{{ $case['intervention'] }}</p>
         </div>
         <div class="proposal-featured-case-results">
-            <span>Resultados observados</span>
+            <span>{{ $en ? 'Observed results' : 'Resultados observados' }}</span>
             @foreach (($case['results'] ?? []) as $result)
                 <article>
                     <strong>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</strong>

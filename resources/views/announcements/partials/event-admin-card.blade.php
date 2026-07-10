@@ -72,7 +72,7 @@
     </details>
 
     <details class="event-admin-details" open>
-        <summary>Inscrições — {{ $event->registrations->count() }}</summary>
+        <summary>Inscrições: {{ $event->registrations->count() }}</summary>
         <div class="event-registration-list">
             @forelse ($event->registrations as $registration)
                 <article>

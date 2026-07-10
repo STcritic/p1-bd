@@ -4,7 +4,12 @@ return [
     'company' => [
         'legal_name' => 'Business Diversity Consultoria Empresarial',
         'short_name' => 'Business Diversity',
-        'tagline' => 'Consultoria de capital humano, desempenho e transformação organizacional.',
+        'tagline'    => 'Consultoria de capital humano, desempenho e transformação organizacional.',
+        'tagline_en' => 'Human capital, performance and organisational transformation consulting.',
+        'email'    => 'info@bdiversity.co.mz',
+        'phone'    => '+258 87 605 2013',
+        'website'  => 'www.bdiversity.co.mz',
+        'address'  => 'Beleluane, Matola Rio, Maputo, Moçambique',
         'summary' => 'A BD apoia organizações a transformar decisões sobre pessoas em resultados de negócio. Ajudamos os nossos parceiros a concentrarem-se no seu core business, enquanto estruturamos soluções de capital humano, back office, desempenho e transformação organizacional com rigor, confidencialidade e utilidade prática.',
         'mission' => 'Ajudar os parceiros a focarem-se no seu negócio principal, assumindo com método e responsabilidade os desafios de pessoas, processos e suporte organizacional.',
         'vision' => 'Ser o parceiro de preferência para organizações que procuram decisões de pessoas mais claras, produtivas e sustentáveis.',
@@ -89,13 +94,14 @@ return [
     ],
 
     'clients' => [
-        ['logo' => 'assets/logo/patnersLogo/Clients/client-01.png', 'name' => 'CAMY'],
-        ['logo' => 'assets/logo/patnersLogo/Clients/client-02.png', 'name' => 'Premier Human Capital'],
-        ['logo' => 'assets/logo/patnersLogo/Clients/client-03.jpg', 'name' => 'Índico'],
-        ['logo' => 'assets/logo/patnersLogo/Clients/client-04.jpg', 'name' => 'Templo Imobiliária e Construções'],
-        ['logo' => 'assets/logo/patnersLogo/Clients/client-05.jpg', 'name' => 'Templo'],
-        ['logo' => 'assets/logo/patnersLogo/Clients/client-06.png', 'name' => 'IMOPETRO'],
-        ['logo' => 'assets/logo/patnersLogo/Clients/Picture5.png', 'name' => 'Premier Human Capital Consulting'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/camy.png',     'name' => 'CAMY'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/imopetro.png', 'name' => 'Imopetro'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/indico.png',   'name' => 'Índico Seguros'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/magui.png',    'name' => 'MaGui'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/mects.png',    'name' => 'MECTS'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/premier.png',  'name' => 'Premier Human Capital'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/templo.jpg',   'name' => 'Templo Imobiliária e Construções'],
+        ['logo' => 'assets/logo/patnersLogo/Clients/amog.jpg',     'name' => 'AMOG'],
     ],
 
     'impact_metrics' => [
@@ -155,9 +161,18 @@ return [
     ],
 
     'credentials' => [
-        'Experiência sénior acumulada em gestão de Recursos Humanos, desenvolvimento organizacional e liderança de processos de pessoas.',
-        'Práticas alinhadas com padrões internacionais de consultoria, confidencialidade, diagnóstico, validação e implementação.',
-        'Rede multidisciplinar de profissionais em RH, comunicação, dados, tecnologia, digitalização e endomarketing.',
-        'Certificados e membresias específicas podem ser anexados conforme a equipa técnica alocada ao projecto.',
+        'profile' => [
+            'Experiência sénior acumulada em gestão de Recursos Humanos, desenvolvimento organizacional e liderança de processos de pessoas.',
+            'Práticas alinhadas com padrões internacionais de consultoria, confidencialidade, diagnóstico, validação e implementação.',
+            'Rede multidisciplinar de profissionais em RH, comunicação, dados, tecnologia, digitalização e endomarketing.',
+            'Certificados e membresias específicas podem ser apresentados conforme a equipa técnica alocada ao projecto.',
+        ],
+        'memberships' => [
+            [
+                'logo' => 'assets/logo/patnersLogo/Clients/ameprh.png',
+                'name' => 'AMEPRH',
+                'type' => 'Associação Moçambicana dos Profissionais de Recursos Humanos',
+            ],
+        ],
     ],
 ];

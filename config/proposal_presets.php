@@ -2,14 +2,14 @@
 
 return [
     'profiles' => [
-        'senior_hr' => 'Consultor sénior de Recursos Humanos — governação técnica, desenho metodológico, validação executiva e gestão de stakeholders.',
-        'people_analytics' => 'Especialista em people analytics — análise de dados, indicadores, dashboards, segmentação e evidências para decisão.',
-        'reward' => 'Especialista em remuneração e benefícios — bandas salariais, equidade interna, benefícios e critérios remuneratórios.',
-        'talent' => 'Especialista em talento e assessment — recrutamento, sucessão, entrevistas estruturadas, avaliação comportamental e potencial.',
-        'learning' => 'Especialista em aprendizagem — desenho instrucional, facilitação, avaliação de impacto e transferência para o posto de trabalho.',
-        'hr_digital' => 'Especialista em integração digital de RH — processos digitais, automação, experiência do colaborador e adopção tecnológica.',
-        'legal_hr' => 'Especialista em políticas e conformidade laboral — revisão de políticas, procedimentos, riscos e alinhamento legal.',
-        'project_pm' => 'Gestor de projecto — planeamento, controlo de entregáveis, cronograma, qualidade e comunicação com o cliente.',
+        'senior_hr' => 'Consultor sénior de Recursos Humanos: governação técnica, desenho metodológico, validação executiva e gestão de stakeholders.',
+        'people_analytics' => 'Especialista em people analytics: análise de dados, indicadores, dashboards, segmentação e evidências para decisão.',
+        'reward' => 'Especialista em remuneração e benefícios: bandas salariais, equidade interna, benefícios e critérios remuneratórios.',
+        'talent' => 'Especialista em talento e assessment: recrutamento, sucessão, entrevistas estruturadas, avaliação comportamental e potencial.',
+        'learning' => 'Especialista em aprendizagem: desenho instrucional, facilitação, avaliação de impacto e transferência para o posto de trabalho.',
+        'hr_digital' => 'Especialista em integração digital de RH: processos digitais, automação, experiência do colaborador e adopção tecnológica.',
+        'legal_hr' => 'Especialista em políticas e conformidade laboral: revisão de políticas, procedimentos, riscos e alinhamento legal.',
+        'project_pm' => 'Gestor de projecto: planeamento, controlo de entregáveis, cronograma, qualidade e comunicação com o cliente.',
     ],
 
     'packages' => [
@@ -31,9 +31,9 @@ return [
     ],
 
     'complexity' => [
-        'baixa' => 'Baixa — uma área, poucos stakeholders, informação organizada e decisões rápidas.',
-        'media' => 'Média — várias áreas, validações intermédias, necessidade de workshops e consolidação documental.',
-        'alta' => 'Alta — múltiplas unidades, dados dispersos, impacto sensível em pessoas, remuneração, cultura ou tecnologia.',
+        'baixa' => 'Baixa: uma área, poucos stakeholders, informação organizada e decisões rápidas.',
+        'media' => 'Média: várias áreas, validações intermédias, necessidade de workshops e consolidação documental.',
+        'alta' => 'Alta: múltiplas unidades, dados dispersos, impacto sensível em pessoas, remuneração, cultura ou tecnologia.',
     ],
 
     'services' => [

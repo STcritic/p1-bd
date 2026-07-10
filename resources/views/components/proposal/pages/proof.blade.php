@@ -1,5 +1,9 @@
 @props(['vm'])
-<x-proposal.page number="14" label="Prova social" title="Resultados e experiências relevantes" variant="proof">
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="14"
+    :label="$en ? 'Social proof' : 'Prova social'"
+    :title="$en ? 'Relevant results and experiences' : 'Resultados e experiências relevantes'"
+    variant="proof">
     @if ($vm->impactMetrics()->isNotEmpty())
         <div class="proposal-credential-metrics proposal-impact-metrics">
             @foreach ($vm->impactMetrics() as $metric)

@@ -54,6 +54,11 @@ class ProposalViewModel
         return $this->identity['company'] ?? [];
     }
 
+    public function lang(): string
+    {
+        return $this->proposal->lang ?? 'pt';
+    }
+
     public function bank(): array
     {
         return $this->identity['bank_details'] ?? [];
@@ -110,6 +115,11 @@ class ProposalViewModel
     public function credentials(): array
     {
         return $this->identity['credentials'] ?? [];
+    }
+
+    public function recruitmentPolicy(): array
+    {
+        return $this->proposal->recruitmentPolicy;
     }
 
     // ─── Text helpers ─────────────────────────────────────────────────────────

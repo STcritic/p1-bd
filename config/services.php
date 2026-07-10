@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'ocr_space' => [
+        'key'      => env('OCR_SPACE_API_KEY'),
+        'endpoint' => 'https://api.ocr.space/parse/image',
+        'engine'   => env('OCR_SPACE_ENGINE', 2),
+        'language' => env('OCR_SPACE_LANGUAGE', 'por'),
+    ],
+
 ];

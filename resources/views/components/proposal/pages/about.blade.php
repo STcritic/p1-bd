@@ -1,6 +1,7 @@
 @props(['vm'])
-@php $company = $vm->company(); @endphp
-<x-proposal.page number="05" label="Sobre nós"
+@php $company = $vm->company(); $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="05"
+    :label="$en ? 'About us' : 'Sobre nós'"
     :title="$company['short_name'] ?? 'Business Diversity'"
     variant="about">
     <div class="proposal-about-grid">
@@ -9,15 +10,15 @@
             @if (!empty($company['mission']) || !empty($company['vision']))
                 <div class="proposal-mission-vision">
                     @if (!empty($company['mission']))
-                        <article><span>Missão</span><p>{{ $company['mission'] }}</p></article>
+                        <article><span>{{ $en ? 'Mission' : 'Missão' }}</span><p>{{ $company['mission'] }}</p></article>
                     @endif
                     @if (!empty($company['vision']))
-                        <article><span>Visão</span><p>{{ $company['vision'] }}</p></article>
+                        <article><span>{{ $en ? 'Vision' : 'Visão' }}</span><p>{{ $company['vision'] }}</p></article>
                     @endif
                 </div>
             @endif
             <div class="proposal-positioning-card">
-                <span>O nosso posicionamento</span>
+                <span>{{ $en ? 'Our positioning' : 'O nosso posicionamento' }}</span>
                 <p>{{ $vm->positioningStatement }}</p>
             </div>
             <div class="proposal-bd-signature-grid">
@@ -50,7 +51,7 @@
                 <img src="{{ asset('assets/images/About.jpg') }}" alt="Business Diversity">
             </div>
             <div class="proposal-block proposal-highlight">
-                <h3>Princípios de qualidade</h3>
+                <h3>{{ $en ? 'Quality principles' : 'Princípios de qualidade' }}</h3>
                 <ul>
                     @foreach ($vm->qualityPrinciples() as $principle)
                         <li>{{ $principle }}</li>

@@ -1,6 +1,8 @@
 @props(['vm'])
-<x-proposal.page number="18" label="Perguntas frequentes"
-    title="Perguntas que antecipamos da sua parte"
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="18"
+    :label="$en ? 'Frequently asked questions' : 'Perguntas frequentes'"
+    :title="$en ? 'Questions we anticipate from you' : 'Perguntas que antecipamos da sua parte'"
     variant="faq">
     @if (!empty($vm->faqs))
         <div class="proposal-faq-list">
@@ -17,7 +19,7 @@
     @endif
     @if (!empty($vm->nextSteps))
         <div class="proposal-next-steps">
-            <h3>Próximos passos</h3>
+            <h3>{{ $en ? 'Next steps' : 'Próximos passos' }}</h3>
             <ol>
                 @foreach ($vm->nextSteps as $step)
                     <li>{{ $step }}</li>

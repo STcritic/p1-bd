@@ -26,7 +26,8 @@
 <section class="section contact-section"><div class="container contact-grid"><div class="contact-details"><span class="eyebrow">{{ $en ? 'GET IN TOUCH' : 'FALE CONNOSCO' }}</span><h2>{{ $en ? 'We are ready to listen.' : 'Estamos prontos para escutar.' }}</h2><p>{{ $en ? 'Use the form or choose the channel that works best for you.' : 'Use o formulário ou escolha o canal mais conveniente para si.' }}</p>
     <div class="contact-method"><span>01</span><div><small>{{ $en ? 'Phone / WhatsApp' : 'Telefone / WhatsApp' }}</small><a href="https://wa.me/258876052013">+258 87 605 2013</a></div></div>
     <div class="contact-method"><span>02</span><div><small>Email</small><a href="mailto:info@bdiversity.co.mz">info@bdiversity.co.mz</a></div></div>
-    <div class="contact-method"><span>03</span><div><small>{{ $en ? 'Office' : 'Escritório' }}</small><a href="https://maps.app.goo.gl/TPeqy9imfq2xwMyt7" target="_blank" rel="noopener">Rua da Mozal, Matola-Rio ↗</a></div></div>
+    <div class="contact-method"><span>03</span><div><small>{{ $en ? 'Office' : 'Escritório' }}</small><a href="https://maps.app.goo.gl/TPeqy9imfq2xwMyt7" target="_blank" rel="noopener">Beleluane, Matola Rio, Maputo, Moçambique ↗</a></div></div>
+    <div class="contact-method"><span>04</span><div><small>Website</small><a href="https://www.bdiversity.co.mz">www.bdiversity.co.mz</a></div></div>
     <a class="arrow-link" href="{{ route($en ? 'en.schedule.show' : 'schedule.show') }}">{{ __('site.common.schedule') }} →</a>
 </div>
 <div class="form-panel">

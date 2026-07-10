@@ -1,10 +1,12 @@
 @props(['vm'])
-<x-proposal.page number="04" label="Argumento estratégico"
+@php $en = $vm->lang() === 'en'; @endphp
+<x-proposal.page number="04"
+    :label="$en ? 'Strategic argument' : 'Argumento estratégico'"
     :title="$vm->criticalCase['title']"
     variant="critical">
     <div class="proposal-critical-grid">
         <div class="proposal-critical-main">
-            <span>Impacto</span>
+            <span>{{ $en ? 'Impact' : 'Impacto' }}</span>
             <p>{{ $vm->criticalCase['intro'] }}</p>
         </div>
         @foreach ($vm->criticalCase['items'] as $index => $item)

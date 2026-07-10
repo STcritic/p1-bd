@@ -6,8 +6,10 @@ use App\Http\Controllers\AnnouncementAuthController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CollaboratorEventController;
+use App\Http\Controllers\CollaboratorOpportunityController;
 use App\Http\Controllers\CollaboratorProposalController;
 use App\Http\Controllers\CollaboratorScheduleController;
+use App\Http\Controllers\DiagnosticPortalController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
@@ -116,6 +118,41 @@ Route::prefix('area-colaborador/propostas')
         Route::get('/{proposal}',          [CollaboratorProposalController::class, 'show'])->name('show');
         Route::patch('/{proposal}/estado',  [CollaboratorProposalController::class, 'updateStatus'])->name('update-status');
         Route::delete('/{proposal}', [CollaboratorProposalController::class, 'destroy'])->name('destroy');
+    });
+
+/* ── Collaborator language toggle ───────────────────────────────────────── */
+Route::post('/area-colaborador/idioma', function () {
+    $lang = request('lang', 'pt');
+    \Illuminate\Support\Facades\Session::put('collab_lang', in_array($lang, ['pt', 'en']) ? $lang : 'pt');
+    return back();
+})->middleware('announcement.admin')->name('collaborator.set-language');
+
+/* ── Consulting Workflow — Opportunities (Collaborator) ─────────────────── */
+Route::prefix('area-colaborador/oportunidades')
+    ->name('collaborator.opportunities.')
+    ->middleware('announcement.admin')
+    ->group(function (): void {
+        Route::get('/',                                  [CollaboratorOpportunityController::class, 'index'])->name('index');
+        Route::get('/nova',                              [CollaboratorOpportunityController::class, 'create'])->name('create');
+        Route::post('/',                                 [CollaboratorOpportunityController::class, 'store'])->name('store');
+        Route::get('/{opportunity}',                     [CollaboratorOpportunityController::class, 'show'])->name('show');
+        Route::post('/{opportunity}/transicao',          [CollaboratorOpportunityController::class, 'transition'])->name('transition');
+        Route::post('/{opportunity}/diagnostico',        [CollaboratorOpportunityController::class, 'sendDiagnostic'])->name('send-diagnostic');
+        Route::post('/{opportunity}/contexto',           [CollaboratorOpportunityController::class, 'refreshContext'])->name('refresh-context');
+        Route::post('/{opportunity}/nota',               [CollaboratorOpportunityController::class, 'addNote'])->name('add-note');
+        Route::get('/{opportunity}/pre-proposta',                             [CollaboratorOpportunityController::class, 'preProposal'])->name('pre-proposal');
+        Route::get('/{opportunity}/proposta',                                 [CollaboratorOpportunityController::class, 'generateProposal'])->name('generate-proposal');
+        Route::get('/{opportunity}/documentos/{document}/download',           [CollaboratorOpportunityController::class, 'downloadDocument'])->name('document-download');
+        Route::delete('/{opportunity}',                                       [CollaboratorOpportunityController::class, 'destroy'])->name('destroy');
+    });
+
+/* ── Diagnostic Client Portal (public — token-only auth) ────────────────── */
+Route::prefix('diagnostico')
+    ->name('diagnostic.')
+    ->group(function (): void {
+        Route::get('/{token}',          [DiagnosticPortalController::class, 'show'])->name('portal');
+        Route::post('/{token}/guardar', [DiagnosticPortalController::class, 'save'])->name('save');
+        Route::post('/{token}/submeter',[DiagnosticPortalController::class, 'submit'])->name('submit');
     });
 
 Route::prefix('en')->name('en.')->group(function (): void {
