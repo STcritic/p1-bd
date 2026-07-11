@@ -1,26 +1,89 @@
+# ==========================================
+# Logs
+# ==========================================
 *.log
-.DS_Store
+
+# ==========================================
+# Environment
+# ==========================================
 .env
+.env.*
+!.env.example
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/.codex
-/.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
+
+# ==========================================
+# Dependencies
+# ==========================================
+/vendor
 /node_modules
-/public/fonts-manifest.dev.json
+
+# ==========================================
+# Public
+# ==========================================
 /public/hot
 /public/storage
+/public/fonts-manifest.dev.json
+
+# ==========================================
+# Storage
+# ==========================================
 /storage/*.key
 /storage/pail
-/vendor
+
+/storage/logs/*
+!/storage/logs/.gitignore
+
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+
+/storage/app/*
+!/storage/app/.gitignore
+!/storage/app/public
+
+# ==========================================
+# Bootstrap Cache
+# ==========================================
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+
+# ==========================================
+# IDE / Editors
+# ==========================================
+.idea/
+/.vscode/
+/.zed/
+/.nova/
+/.cursor/
+/.codex/
+
+# ==========================================
+# PHP Tools
+# ==========================================
+.phpactor.json
+.phpunit.result.cache
+.phpunit.cache
 _ide_helper.php
+auth.json
+
+# ==========================================
+# Laravel Sail / Homestead
+# ==========================================
 Homestead.json
 Homestead.yaml
+
+# ==========================================
+# Operating System
+# ==========================================
+.DS_Store
 Thumbs.db
+desktop.ini
