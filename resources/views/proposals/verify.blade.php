@@ -2,6 +2,7 @@
 
 @section('title', 'Verificação de proposta')
 @section('description', 'Confirme a validade de uma proposta emitida pela Business Diversity.')
+@section('robots', 'noindex,follow,noarchive')
 
 @section('content')
 @php

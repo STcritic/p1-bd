@@ -1,34 +1,7 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#073b73">
-    <title>@yield('title', 'Business Diversity') | Business Diversity</title>
-    <meta name="description" content="@yield('description', 'Consultoria empresarial e soluções de capital humano em Moçambique.')">
-    <link rel="canonical" href="{{ url()->current() }}">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="@yield('title', 'Business Diversity') | Business Diversity">
-    <meta property="og:description" content="@yield('description', 'Consultoria empresarial e soluções de capital humano em Moçambique.')">
-    <meta property="og:image" content="{{ asset('assets/img/logo/logo.png') }}">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <link rel="icon" href="{{ asset('favicon/favicon.ico') }}">
-    <link rel="apple-touch-icon" href="{{ asset('favicon/apple-touch-icon.png') }}">
-    <script>document.documentElement.classList.add('js')</script>
-    @vite('resources/js/app.js')
-    <script type="application/ld+json">{!! json_encode([
-        '@context' => 'https://schema.org',
-        '@type' => 'ProfessionalService',
-        'name' => 'Business Diversity CE, SA',
-        'url' => config('app.url'),
-        'telephone' => '+258876052013',
-        'email' => 'info@bdiversity.co.mz',
-        'address' => ['@type' => 'PostalAddress', 'streetAddress' => 'Beleluane, Matola Rio', 'addressLocality' => 'Maputo', 'addressCountry' => 'MZ'],
-        'url' => 'https://www.bdiversity.co.mz',
-    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
-</head>
-<body>
 @php
+    $locale = $locale ?? app()->getLocale() ?? 'pt';
+    app()->setLocale($locale);
+
     $isEnglish = $locale === 'en';
     $routes = $isEnglish
         ? ['home' => 'en.home', 'about' => 'en.about', 'services' => 'en.services', 'events' => 'en.events', 'contact' => 'en.contact']
@@ -39,22 +12,47 @@
     $currentRoute = request()->route()?->getName();
     $currentGuide = request()->route('guide');
     $currentEvent = request()->route('event');
-    $alternateRoute = $alternate[$currentRoute] ?? ($isEnglish ? 'home' : 'en.home');
-    $alternateUrl = $currentRoute === 'resource.show'
-        ? route('en.resource.show', $currentGuide)
-        : ($currentRoute === 'en.resource.show'
-            ? route('resource.show', $currentGuide)
-            : ($currentRoute === 'events.show'
-                ? route('en.events.show', $currentEvent)
-                : ($currentRoute === 'en.events.show'
-                    ? route('events.show', $currentEvent)
-                    : route($alternateRoute))));
+    $alternateUrl = null;
+    $defaultUrl = url()->current();
+
+    if ($currentRoute === 'resource.show' && $currentGuide) {
+        $alternateUrl = route('en.resource.show', $currentGuide);
+        $defaultUrl = route('resource.show', $currentGuide);
+    } elseif ($currentRoute === 'en.resource.show' && $currentGuide) {
+        $alternateUrl = route('resource.show', $currentGuide);
+        $defaultUrl = route('resource.show', $currentGuide);
+    } elseif ($currentRoute === 'events.show' && $currentEvent) {
+        $alternateUrl = route('en.events.show', $currentEvent);
+        $defaultUrl = route('events.show', $currentEvent);
+    } elseif ($currentRoute === 'en.events.show' && $currentEvent) {
+        $alternateUrl = route('events.show', $currentEvent);
+        $defaultUrl = route('events.show', $currentEvent);
+    } elseif (isset($alternate[$currentRoute])) {
+        $alternateUrl = route($alternate[$currentRoute]);
+        $defaultRoute = $isEnglish ? $alternate[$currentRoute] : $currentRoute;
+        $defaultUrl = route($defaultRoute);
+    }
+
     $siteAnnouncement = request()->routeIs('proposals.verify*')
         ? null
         : (\Illuminate\Support\Facades\Schema::hasTable('announcements')
         ? \App\Models\Announcement::query()->visible()->orderBy('priority')->latest()->first()
         : null);
 @endphp
+<!DOCTYPE html>
+<html lang="{{ $locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', 'Business Diversity') | Business Diversity</title>
+    <x-meta :locale="$locale" :canonical-url="url()->current()" :default-url="$defaultUrl" />
+    @if ($alternateUrl)
+        <link rel="alternate" hreflang="pt" href="{{ $locale === 'pt' ? url()->current() : $alternateUrl }}">
+        <link rel="alternate" hreflang="en" href="{{ $locale === 'en' ? url()->current() : $alternateUrl }}">
+    @endif
+    @vite('resources/js/app.js')
+</head>
+<body>
 <a class="skip-link" href="#main">{{ $isEnglish ? 'Skip to content' : 'Saltar para o conteúdo' }}</a>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -77,7 +75,9 @@
             @foreach ($routes as $key => $routeName)
                 <a href="{{ route($routeName) }}" @class(['active' => request()->routeIs($routeName) || ($key === 'services' && request()->routeIs($isEnglish ? 'en.resource.show' : 'resource.show')) || ($key === 'events' && request()->routeIs($isEnglish ? 'en.events.show' : 'events.show'))])>{{ __('site.nav.'.$key) }}</a>
             @endforeach
-            <a class="language-link" href="{{ $alternateUrl }}" hreflang="{{ $isEnglish ? 'pt' : 'en' }}">{{ $isEnglish ? 'PT' : 'EN' }}</a>
+            @if ($alternateUrl)
+                <a class="language-link" href="{{ $alternateUrl }}" hreflang="{{ $isEnglish ? 'pt' : 'en' }}">{{ $isEnglish ? 'PT' : 'EN' }}</a>
+            @endif
             <a class="button button-intranet" href="{{ route('announcements.login') }}" aria-label="{{ __('site.nav.intranet') }}">{{ __('site.nav.intranet') }} <span aria-hidden="true">↗</span></a>
         </nav>
     </div>
