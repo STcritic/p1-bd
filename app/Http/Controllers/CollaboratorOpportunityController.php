@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnnouncementAdmin;
 use App\Modules\Collaborator\Opportunity\Actions\CreateOpportunity;
 use App\Modules\Collaborator\Opportunity\Actions\SendDiagnosticSession;
 use App\Modules\Collaborator\Opportunity\Builders\OpportunityProposalBuilder;
@@ -33,9 +34,9 @@ class CollaboratorOpportunityController extends Controller
 
     public function index(): View
     {
-        $adminId = Session::get('announcement_admin_id');
+        $admin = $this->currentAdmin();
 
-        $opportunities = Opportunity::forAdmin($adminId)
+        $opportunities = ($admin->is_master ? Opportunity::query() : Opportunity::forAdmin($admin->id))
             ->with(['latestSession'])
             ->orderByRaw("CASE status
                 WHEN 'diagnosis_received' THEN 0
@@ -303,7 +304,17 @@ class CollaboratorOpportunityController extends Controller
 
     private function authorizeOpportunity(Opportunity $opportunity): void
     {
-        $adminId = Session::get('announcement_admin_id');
-        abort_if($opportunity->announcement_admin_id !== $adminId, 403);
+        $admin = $this->currentAdmin();
+
+        if ($admin->is_master) {
+            return;
+        }
+
+        abort_if((int) $opportunity->announcement_admin_id !== (int) $admin->id, 403);
+    }
+
+    private function currentAdmin(): AnnouncementAdmin
+    {
+        return AnnouncementAdmin::query()->findOrFail(Session::get('announcement_admin_id'));
     }
 }
