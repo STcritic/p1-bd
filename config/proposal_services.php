@@ -229,6 +229,91 @@ return [
         ],
     ],
 
+    'diagnostico-cultura-organizacional' => [
+        'service_need'          => 'A prioridade não é apenas medir clima; é compreender como valores, liderança, comunicação, rituais e práticas reais influenciam confiança, colaboração e execução.',
+        'positioning_statement' => 'A BD não trata cultura como discurso institucional. Diagnosticamos evidências, padrões de comportamento e incoerências entre valores declarados e práticas reais para apoiar decisões de liderança com clareza.',
+        'bd_signature_extras'   => [
+            ['label' => 'Cultura traduzida em evidências', 'text' => 'Combinamos questionários, entrevistas, documentos e sinais do dia-a-dia para separar percepção, prática e prioridade de acção.'],
+        ],
+        'critical_case' => [
+            'title' => 'Porque diagnosticar cultura é crítico',
+            'intro' => 'Quando a cultura não é compreendida, mudanças falham, valores ficam apenas no papel e a liderança decide com base em impressões dispersas. Um diagnóstico estruturado revela o que fortalece ou bloqueia confiança, colaboração, adaptação e desempenho.',
+            'items' => ['Alinhamento entre valores e práticas reais', 'Confiança e comunicação entre liderança e equipas', 'Capacidade de adaptação a mudanças', 'Prioridades claras para intervenção cultural'],
+        ],
+        'featured_case' => [
+            'title'        => 'Caso aplicado: diagnóstico cultural para alinhamento de liderança',
+            'sector'       => 'Organização em crescimento e mudança',
+            'challenge'    => 'A liderança percebia desalinhamentos entre áreas, comunicação inconsistente e dificuldade em transformar valores institucionais em comportamentos observáveis.',
+            'intervention' => 'A BD estruturou um diagnóstico com questionário, entrevistas, análise de práticas e sessão executiva de devolução, ligando resultados a prioridades de acção e rituais de liderança.',
+            'results'      => [
+                'Mapa claro de forças culturais, tensões e riscos de mudança.',
+                'Identificação de incoerências entre valores declarados e práticas vividas.',
+                'Plano de acção cultural com prioridades, responsáveis e indicadores simples.',
+            ],
+            'note' => 'O diagnóstico preserva confidencialidade e apresenta resultados agregados, evitando exposição individual dos participantes.',
+        ],
+        'process_flow' => ['Alinhar', 'Medir', 'Escutar', 'Triangular', 'Priorizar', 'Activar'],
+        'methodology' => [
+            'Kickoff executivo para clarificar objectivo, escopo, stakeholders e critérios de confidencialidade.',
+            'Recolha multimétodo: questionário, entrevistas/focus groups, análise documental e leitura de rituais/práticas de gestão.',
+            'Análise por dimensões culturais: missão, envolvimento, consistência, adaptabilidade, liderança, comunicação e confiança.',
+            'Triangulação de evidências para distinguir percepção, prática recorrente, tensão cultural e risco de mudança.',
+            'Devolução executiva com mapa de cultura actual, cultura desejada, prioridades e plano de acção.',
+        ],
+        'roadmap' => [
+            ['label' => 'Arranque',    'title' => 'Alinhamento e desenho do diagnóstico', 'text' => 'Confirmação do objectivo, segmentos a auscultar, canais, calendário, comunicação e garantias de confidencialidade.'],
+            ['label' => 'Escuta',      'title' => 'Questionário e conversas estruturadas', 'text' => 'Aplicação do diagnóstico, entrevistas/focus groups e recolha de percepções por grupos relevantes.'],
+            ['label' => 'Evidências',  'title' => 'Triangulação cultural',                'text' => 'Análise de respostas, documentos, rituais, práticas de liderança, comunicação interna e padrões de decisão.'],
+            ['label' => 'Síntese',     'title' => 'Mapa cultural e riscos',                'text' => 'Identificação de forças, incoerências, tensões, alavancas e riscos prioritários para a liderança.'],
+            ['label' => 'Activação',   'title' => 'Plano de acção cultural',               'text' => 'Workshop executivo para priorizar acções, responsabilidades, rituais, comunicação e indicadores de acompanhamento.'],
+        ],
+        'timeline' => [
+            ['period' => 'Semana 1',   'title' => 'Preparação',        'text' => 'Kickoff, desenho do diagnóstico, amostra, comunicação e instrumentos.'],
+            ['period' => 'Semana 2-3', 'title' => 'Recolha',           'text' => 'Questionário, entrevistas/focus groups e recolha documental.'],
+            ['period' => 'Semana 4',   'title' => 'Análise',           'text' => 'Tratamento de dados, segmentação e triangulação de evidências.'],
+            ['period' => 'Semana 5',   'title' => 'Devolução',         'text' => 'Relatório executivo, mapa cultural e workshop com liderança.'],
+            ['period' => 'Semana 6',   'title' => 'Plano de acção',    'text' => 'Priorização de iniciativas, indicadores, rituais e próximos passos.'],
+        ],
+        'success_metrics' => [
+            ['label' => 'Participação no diagnóstico',       'target' => '>=70%',      'note' => 'Meta ajustável conforme dimensão, canais e população abrangida.'],
+            ['label' => 'Segmentos críticos auscultados',    'target' => '100%',       'note' => 'Liderança, RH e grupos-chave incluídos conforme escopo aprovado.'],
+            ['label' => 'Evidências trianguladas',           'target' => '3 fontes',   'note' => 'Questionário, entrevistas/focus groups, documentos ou práticas observáveis.'],
+            ['label' => 'Prioridades culturais definidas',   'target' => '3-5',        'note' => 'Foco em poucas alavancas com impacto e governança clara.'],
+            ['label' => 'Plano de acção aprovado',           'target' => '100%',       'note' => 'Acções, responsáveis, calendário e indicadores validados pela liderança.'],
+        ],
+        'technical_tools' => [
+            ['name' => 'Matriz de diagnóstico cultural',       'use' => 'Organiza dimensões, evidências, forças, tensões e prioridades por grupo analisado.'],
+            ['name' => 'Guião de entrevista cultural',         'use' => 'Explora valores vividos, práticas de liderança, comunicação, confiança e pressupostos do dia-a-dia.'],
+            ['name' => 'Mapa de alinhamento valores-práticas', 'use' => 'Compara valores declarados com comportamentos, rituais, decisões e sistemas existentes.'],
+        ],
+        'practical_outputs' => [
+            'Questionário de cultura', 'Guiões de entrevista/focus group', 'Mapa da cultura actual',
+            'Mapa da cultura desejada', 'Relatório de forças e riscos culturais',
+            'Matriz valores-práticas', 'Plano de acção cultural de 90 dias',
+            'Recomendações de comunicação e liderança',
+        ],
+        'differentiators' => [
+            'Leitura cultural baseada em evidências e não apenas em opiniões isoladas',
+            'Combinação de questionário, escuta qualitativa e análise de práticas reais',
+            'Confidencialidade e comunicação cuidadosa para aumentar confiança dos participantes',
+            'Recomendações accionáveis para liderança, RH, comunicação e rituais de gestão',
+            'Foco em prioridades realistas, mensuráveis e ligadas ao desempenho organizacional',
+        ],
+        'faqs' => [
+            ['question' => 'Este diagnóstico é uma pesquisa de clima?', 'answer' => 'Pode incluir indicadores de clima, mas vai além disso: cruza valores, comportamentos, liderança, comunicação, rituais, práticas e pressupostos que influenciam a forma como a organização funciona.'],
+            ['question' => 'As respostas dos colaboradores são confidenciais?', 'answer' => 'Sim. A BD trabalha com tratamento agregado dos resultados e boas práticas de confidencialidade, evitando exposição individual dos participantes.'],
+            ['question' => 'Quem deve participar?', 'answer' => 'Depende do objectivo. O diagnóstico pode envolver toda a organização ou uma amostra por áreas, níveis e unidades críticas, incluindo liderança e grupos de colaboradores.'],
+            ['question' => 'O resultado será apenas um relatório?', 'answer' => 'Não. O relatório é acompanhado por prioridades, recomendações e plano de acção para transformar achados culturais em decisões práticas.'],
+            ['question' => 'Quanto tempo demora?', 'answer' => 'O prazo típico varia entre 4 e 8 semanas, conforme dimensão da população, número de entrevistas/focus groups e nível de segmentação pretendido.'],
+            ['question' => 'A BD ajuda depois da devolução?', 'answer' => 'Sim. O serviço pode evoluir para facilitação de workshops, comunicação interna, rituais de liderança, acompanhamento de indicadores e apoio à implementação do plano cultural.'],
+        ],
+        'next_steps' => [
+            'Aprovação da proposta', 'Kickoff executivo', 'Plano de comunicação do diagnóstico',
+            'Aplicação do questionário e entrevistas', 'Análise e triangulação',
+            'Workshop de devolução', 'Plano de acção cultural',
+        ],
+    ],
+
     'carreira-sucessao' => [
         'service_need' => 'A prioridade não é apenas desenhar carreiras; é reduzir risco de continuidade e preparar talento para funções críticas.',
         'process_flow' => ['Cargos críticos', 'Talentos', 'Potencial', 'Sucessores', 'Desenvolvimento', 'Comité'],

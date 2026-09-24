@@ -4,6 +4,7 @@ return [
     'profiles' => [
         'senior_hr' => 'Consultor sénior de Recursos Humanos: governação técnica, desenho metodológico, validação executiva e gestão de stakeholders.',
         'people_analytics' => 'Especialista em people analytics: análise de dados, indicadores, dashboards, segmentação e evidências para decisão.',
+        'culture_od' => 'Especialista em cultura e desenvolvimento organizacional: diagnóstico cultural, mudança, liderança, rituais, alinhamento de valores e planos de acção.',
         'reward' => 'Especialista em remuneração e benefícios: bandas salariais, equidade interna, benefícios e critérios remuneratórios.',
         'talent' => 'Especialista em talento e assessment: recrutamento, sucessão, entrevistas estruturadas, avaliação comportamental e potencial.',
         'learning' => 'Especialista em aprendizagem: desenho instrucional, facilitação, avaliação de impacto e transferência para o posto de trabalho.',
@@ -75,6 +76,50 @@ return [
                     'Diagnóstico executivo' => 'MZN 85.000 – 180.000',
                     'Implementação estruturada' => 'MZN 220.000 – 650.000',
                     'Acompanhamento mensal' => 'MZN 55.000 – 180.000/mês',
+                ],
+            ],
+        ],
+
+        'diagnostico-cultura-organizacional' => [
+            'approaches' => [
+                'Leitura da cultura em múltiplas camadas: práticas observáveis, valores declarados e pressupostos que orientam decisões.',
+                'Mapeamento de missão, envolvimento, consistência e adaptabilidade como dimensões de eficácia cultural.',
+                'Triangulação entre questionário, entrevistas/focus groups, documentos, rituais e evidências do dia-a-dia.',
+                'Segmentação dos resultados por liderança, áreas, níveis ou unidades para identificar padrões críticos.',
+                'Priorização de forças, tensões culturais, riscos de mudança e alavancas de alinhamento interno.',
+                'Plano de acção cultural com responsabilidades, comunicação, rituais e indicadores acompanháveis.',
+            ],
+            'modules' => [
+                'Alinhamento executivo do objectivo do diagnóstico e hipóteses culturais.',
+                'Desenho e aplicação de questionário de cultura organizacional.',
+                'Entrevistas ou focus groups com liderança e amostra de colaboradores.',
+                'Análise documental, rituais, práticas de comunicação e evidências de gestão.',
+                'Síntese do mapa de cultura actual, cultura desejada e lacunas prioritárias.',
+                'Workshop executivo de devolução e construção do plano de acção cultural.',
+            ],
+            'deliverables' => [
+                'Questionário e guião de diagnóstico cultural.',
+                'Mapa da cultura actual e cultura desejada.',
+                'Relatório de forças, tensões e riscos culturais.',
+                'Matriz de alinhamento entre valores, práticas, liderança e comunicação.',
+                'Plano de acção cultural de 90 dias.',
+                'Recomendações de comunicação, rituais e indicadores de acompanhamento.',
+            ],
+            'questions' => [
+                'O que motivou o diagnóstico: mudança, baixa colaboração, crescimento, integração pós-fusão ou reforço de valores?',
+                'A organização já possui valores, missão e comportamentos esperados formalizados?',
+                'Quantos colaboradores, áreas ou unidades devem ser abrangidos?',
+                'Há sinais de baixa confiança, silos, resistência à mudança ou desalinhamento de liderança?',
+                'A liderança pretende apenas diagnóstico executivo ou também plano de intervenção cultural?',
+            ],
+            'profiles' => ['senior_hr', 'culture_od', 'people_analytics', 'project_pm'],
+            'pricing' => [
+                'base' => 'Por projecto, ajustado por dimensão da amostra, número de entrevistas/focus groups, segmentação dos resultados e profundidade do plano de acção.',
+                'drivers' => ['Número de colaboradores abrangidos', 'Número de áreas/unidades', 'Entrevistas e focus groups', 'Segmentação e análise de dados', 'Workshops de devolução e plano de acção'],
+                'ranges' => [
+                    'Diagnóstico executivo' => 'MZN 95.000 – 240.000',
+                    'Implementação estruturada' => 'MZN 260.000 – 850.000',
+                    'Acompanhamento mensal' => 'MZN 70.000 – 220.000/mês',
                 ],
             ],
         ],

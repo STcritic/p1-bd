@@ -25,6 +25,13 @@ return [
             ['key' => 'tecnologia',  'label' => 'Tecnologia e plataforma LMS'],
             ['key' => 'outros',      'label' => 'Outros'],
         ],
+        'diagnostico-cultura-organizacional' => [
+            ['key' => 'questionario', 'label' => 'Questionário e tratamento de dados'],
+            ['key' => 'entrevistas',  'label' => 'Entrevistas e focus groups'],
+            ['key' => 'workshops',    'label' => 'Workshops executivos'],
+            ['key' => 'logistica',    'label' => 'Logística e deslocações'],
+            ['key' => 'outros',       'label' => 'Outros'],
+        ],
         'perfil-comportamental' => [
             ['key' => 'instrumentos', 'label' => 'Instrumentos / licenças de avaliação'],
             ['key' => 'logistica',    'label' => 'Logística e deslocações'],

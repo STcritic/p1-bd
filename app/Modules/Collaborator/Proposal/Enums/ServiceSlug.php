@@ -6,6 +6,7 @@ enum ServiceSlug: string
 {
     case RecrutamentoSeleccao          = 'recrutamento-seleccao';
     case GestaoDesempenho              = 'gestao-desempenho';
+    case DiagnosticoCulturaOrganizacional = 'diagnostico-cultura-organizacional';
     case CarreiraSuccessao             = 'carreira-sucessao';
     case AvaliacaoClassificacaoCargos  = 'avaliacao-classificacao-cargos';
     case PerfilComportamental          = 'perfil-comportamental';

@@ -24,6 +24,7 @@ return [
     'cover_images' => [
         'recrutamento-seleccao'           => 'assets/images/service_03.jpg',
         'gestao-desempenho'               => 'assets/images/pexels-pixabay-265087.jpg',
+        'diagnostico-cultura-organizacional' => 'assets/images/hero-consulting-team.png',
         'carreira-sucessao'               => 'assets/images/hero-consulting-team.png',
         'avaliacao-classificacao-cargos'  => 'assets/images/service_02.jpg',
         'perfil-comportamental'           => 'assets/images/service_00.jpg',
@@ -41,6 +42,7 @@ return [
      */
     'profile_team_map' => [
         'senior_hr'       => 'sandra',
+        'culture_od'      => 'sandra',
         'talent'          => 'sandra',
         'learning'        => 'sandra',
         'reward'          => 'sandra',

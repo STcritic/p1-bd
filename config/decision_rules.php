@@ -143,6 +143,66 @@ return [
             ],
         ],
 
+        // ── Organizational culture diagnosis ────────────────────────────────
+
+        [
+            'id'         => 'culture_values_gap',
+            'services'   => ['diagnostico-cultura-organizacional'],
+            'conditions' => [['field' => 'valores_praticados', 'operator' => 'eq', 'value' => 'baixo']],
+            'actions'    => [
+                'set_score_dimension' => ['complexity' => 20],
+                'add_argument'        => 'O diagnóstico preliminar indica possível distância entre valores declarados e práticas reais. A proposta deve priorizar evidências comportamentais, rituais de liderança e mecanismos de alinhamento cultural.',
+                'add_tag'             => 'desalinhamento-cultural',
+                'flag_risk'           => 'Valores pouco praticados: risco de baixa credibilidade caso a intervenção cultural não seja acompanhada por acções visíveis da liderança.',
+            ],
+        ],
+
+        [
+            'id'         => 'culture_leadership_alignment_low',
+            'services'   => ['diagnostico-cultura-organizacional'],
+            'conditions' => [['field' => 'alinhamento_lideranca', 'operator' => 'eq', 'value' => 'baixo']],
+            'actions'    => [
+                'set_score_dimension' => ['complexity' => 20],
+                'add_argument'        => 'O baixo alinhamento da liderança sobre a cultura desejada exige uma etapa executiva forte, antes de comunicar expectativas ou acções à organização.',
+                'add_tag'             => 'lideranca-desalinhada',
+                'add_timeline_note'   => 'Prever sessão executiva de alinhamento antes da devolução ampla dos resultados culturais.',
+            ],
+        ],
+
+        [
+            'id'         => 'culture_low_trust',
+            'services'   => ['diagnostico-cultura-organizacional'],
+            'conditions' => [['field' => 'confianca_lideranca', 'operator' => 'eq', 'value' => 'baixa']],
+            'actions'    => [
+                'set_score_dimension' => ['complexity' => 15],
+                'add_argument'        => 'A confiança percebida na liderança é um factor sensível. A metodologia deverá reforçar confidencialidade, comunicação transparente e devolução cuidadosa dos resultados.',
+                'flag_risk'           => 'Baixa confiança declarada: recomenda-se comunicação prévia clara e tratamento agregado das respostas.',
+            ],
+        ],
+
+        [
+            'id'         => 'culture_change_in_progress',
+            'services'   => ['diagnostico-cultura-organizacional'],
+            'conditions' => [['field' => 'mudanca_em_curso', 'operator' => 'eq', 'value' => '1']],
+            'actions'    => [
+                'set_score_dimension' => ['complexity' => 15, 'urgency' => 10],
+                'add_argument'        => 'Existe mudança relevante em curso ou prevista; por isso, o diagnóstico cultural deve ligar forças, resistências e mensagens de liderança ao plano de mudança.',
+                'add_tag'             => 'mudanca-cultural',
+                'add_timeline_note'   => 'Mudança em curso: incluir leitura de riscos de adopção e comunicação no diagnóstico cultural.',
+            ],
+        ],
+
+        [
+            'id'         => 'culture_high_sensitivity',
+            'services'   => ['diagnostico-cultura-organizacional'],
+            'conditions' => [['field' => 'confidencialidade_sensibilidade', 'operator' => 'eq', 'value' => 'alta']],
+            'actions'    => [
+                'set_score_dimension' => ['complexity' => 15],
+                'add_argument'        => 'A sensibilidade elevada do tema exige uma abordagem de auscultação segura, comunicação cuidadosa e validação prévia das mensagens aos participantes.',
+                'flag_risk'           => 'Tema cultural sensível: sem confiança no processo, a taxa e qualidade de participação podem ser afectadas.',
+            ],
+        ],
+
         // ── Information availability ─────────────────────────────────────────
 
         [

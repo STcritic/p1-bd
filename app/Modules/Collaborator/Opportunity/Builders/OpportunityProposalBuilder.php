@@ -68,7 +68,7 @@ final class OpportunityProposalBuilder
             'client_position' => $ctx['participantes_decisao'] ?? null,
             'client_location' => $ctx['local_trabalho']        ?? null,
             'client_industry' => $ctx['sector']                ?? $opportunity->client_industry,
-            'client_insight'  => $this->buildClientInsight($ctx, $score),
+            'client_insight'  => $this->buildClientInsight($ctx, $score, $opportunity->service_slug),
 
             // Brief
             'challenge'    => $this->buildChallenge($opportunity, $ctx, $en),
@@ -149,6 +149,27 @@ final class OpportunityProposalBuilder
             }
         }
 
+        if ($opportunity->service_slug === 'diagnostico-cultura-organizacional') {
+            $areas = $ctx['areas_abrangidas'] ?? null;
+            if ($areas) {
+                $parts[] = $en
+                    ? 'Organizational culture diagnosis covering ' . $this->contextValue($areas) . '.'
+                    : 'Diagnóstico da cultura organizacional abrangendo ' . $this->contextValue($areas) . '.';
+            }
+
+            if (($ctx['valores_praticados'] ?? null) === 'baixo') {
+                $parts[] = $en
+                    ? 'There are signs that stated values are not yet consistently reflected in daily practices.'
+                    : 'Há sinais de que os valores declarados ainda não se reflectem de forma consistente nas práticas do dia-a-dia.';
+            }
+
+            if (($ctx['mudanca_em_curso'] ?? null) === '1' && ! empty($ctx['mudanca_descricao'])) {
+                $parts[] = $en
+                    ? 'The diagnosis should support an ongoing or planned change: ' . trim($this->contextValue($ctx['mudanca_descricao']), '.') . '.'
+                    : 'O diagnóstico deve apoiar uma mudança em curso ou prevista: ' . trim($this->contextValue($ctx['mudanca_descricao']), '.') . '.';
+            }
+        }
+
         $desafio = $ctx['desafio_estrategico'] ?? null;
         if ($desafio) $parts[] = trim($desafio, '.');
 
@@ -174,7 +195,14 @@ final class OpportunityProposalBuilder
                 : "Necessidade de {$serviceTitle} alinhada com os objectivos e contexto organizacional de {$opportunity->client_name}.";
         }
 
-        return implode(' ', $parts);
+        return implode(' ', array_map(fn (string $part): string => $this->sentence($part), $parts));
+    }
+
+    private function sentence(string $text): string
+    {
+        $text = trim($text);
+
+        return preg_match('/[.!?]$/u', $text) ? $text : $text . '.';
     }
 
     private function buildObjectives(array $ctx): string
@@ -182,12 +210,30 @@ final class OpportunityProposalBuilder
         return $ctx['objectivo_principal'] ?? '';
     }
 
-    private function buildClientInsight(array $ctx, array $score): string
+    private function buildClientInsight(array $ctx, array $score, string $slug = ''): string
     {
         $parts = [];
 
         $cultura = $ctx['cultura_organizacional'] ?? null;
-        if ($cultura) $parts[] = $cultura;
+        if ($cultura) $parts[] = $this->contextValue($cultura);
+
+        if ($slug === 'diagnostico-cultura-organizacional') {
+            $signals = [
+                'Áreas abrangidas' => $ctx['areas_abrangidas'] ?? null,
+                'Valores praticados' => $ctx['valores_praticados'] ?? null,
+                'Alinhamento da liderança' => $ctx['alinhamento_lideranca'] ?? null,
+                'Confiança na liderança' => $ctx['confianca_lideranca'] ?? null,
+                'Comunicação interna' => $ctx['comunicacao_interna'] ?? null,
+                'Riscos culturais' => $ctx['riscos_culturais'] ?? null,
+                'Sensibilidade' => $ctx['confidencialidade_sensibilidade'] ?? null,
+            ];
+
+            foreach ($signals as $label => $value) {
+                if ($value !== null && $value !== '' && $value !== []) {
+                    $parts[] = "{$label}: " . $this->contextValue($value) . '.';
+                }
+            }
+        }
 
         // Inject decision arguments as additional context
         $arguments = $score['arguments'] ?? [];
@@ -196,6 +242,15 @@ final class OpportunityProposalBuilder
         }
 
         return implode(' ', $parts);
+    }
+
+    private function contextValue(mixed $value): string
+    {
+        if (is_array($value)) {
+            return implode(', ', array_map(fn ($item): string => $this->contextValue($item), $value));
+        }
+
+        return trim(str_replace('_', ' ', (string) $value));
     }
 
     // ── Timeline ──────────────────────────────────────────────────────────────
@@ -226,6 +281,24 @@ final class OpportunityProposalBuilder
                 };
         }
 
+        if ($slug === 'diagnostico-cultura-organizacional') {
+            $largePopulation = (int) ($ctx['dimensao_empresa'] ?? 0) >= 500;
+            $sensitive = ($ctx['confidencialidade_sensibilidade'] ?? null) === 'alta';
+            $change = ($ctx['mudanca_em_curso'] ?? null) === '1';
+
+            return $en
+                ? match (true) {
+                    $largePopulation || $sensitive || $change => '6 to 10 weeks after award, depending on sampling, interviews and leadership availability.',
+                    in_array($urgencia, ['critica', 'alta'], true) => '4 to 6 weeks after award, with a compressed diagnostic plan.',
+                    default => '5 to 8 weeks after award.',
+                }
+                : match (true) {
+                    $largePopulation || $sensitive || $change => '6 a 10 semanas após adjudicação, conforme amostra, entrevistas e disponibilidade da liderança.',
+                    in_array($urgencia, ['critica', 'alta'], true) => '4 a 6 semanas após adjudicação, com plano de diagnóstico comprimido.',
+                    default => '5 a 8 semanas após adjudicação.',
+                };
+        }
+
         return $en
             ? match ($urgencia) {
                 'critica', 'alta' => '4 to 6 weeks after award.',
@@ -251,6 +324,22 @@ final class OpportunityProposalBuilder
             $parts[] = $en
                 ? 'Legal requirement (INEFP): current labour legislation requires the employer to notify the National Institute of Employment and Vocational Training (INEFP) of the intention to hire, with a minimum of 7 working days in advance. This obligation rests entirely with the client/employer. BD can assist with drafting the notification upon request.'
                 : 'Obrigação legal (INEFP): a legislação laboral vigente determina que o empregador comunique ao Instituto Nacional do Emprego e Formação Profissional (INEFP) a intenção de contratar, com antecedência mínima de 7 dias úteis. Esta responsabilidade incumbe integralmente ao cliente/empregador. A BD pode apoiar na preparação da comunicação mediante solicitação.';
+        }
+
+        if ($slug === 'diagnostico-cultura-organizacional') {
+            $parts[] = $en
+                ? 'Culture diagnosis requires confidential treatment of individual inputs. Findings will be presented in aggregate form, except where the client formally approves another format.'
+                : 'O diagnóstico cultural exige tratamento confidencial das contribuições individuais. Os resultados serão apresentados de forma agregada, salvo aprovação formal de outro formato pelo cliente.';
+
+            $parts[] = $en
+                ? 'The client should appoint an executive sponsor and a focal point to support communication, scheduling and access to relevant documents.'
+                : 'O cliente deverá indicar um patrocinador executivo e um ponto focal para apoiar comunicação, agendamento e acesso a documentos relevantes.';
+
+            if (($ctx['confidencialidade_sensibilidade'] ?? null) === 'alta') {
+                $parts[] = $en
+                    ? 'High sensitivity declared: the communication plan and participant messaging should be validated before launching the diagnostic.'
+                    : 'Sensibilidade alta declarada: o plano de comunicação e a mensagem aos participantes deverão ser validados antes do lançamento do diagnóstico.';
+            }
         }
 
         $docs = $ctx['documentos_disponiveis'] ?? null;

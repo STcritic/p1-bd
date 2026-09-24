@@ -13,6 +13,16 @@ return [
             'deliverables' => ['Modelo de gestão de desempenho', 'Matriz de objectivos e indicadores', 'Instrumentos de avaliação', 'Guião para feedback e calibração'],
         ],
         [
+            'slug' => 'diagnostico-cultura-organizacional',
+            'title' => 'Diagnóstico da Cultura Organizacional',
+            'short' => 'Leitura estruturada de valores, comportamentos, liderança, comunicação e práticas que moldam a experiência e o desempenho.',
+            'value' => 'Diagnosticar cultura organizacional ajuda a revelar alinhamentos e incoerências entre valores declarados, práticas reais e objectivos estratégicos antes de propor mudanças.',
+            'audience' => 'Lideranças e equipas de RH que precisam compreender a cultura actual, preparar mudanças, reduzir ruídos internos ou fortalecer alinhamento.',
+            'alerts' => ['Valores declarados pouco visíveis no dia-a-dia.', 'Silos, baixa colaboração ou ruídos entre áreas.', 'Comunicação interna inconsistente ou baixa confiança na liderança.', 'Resistência recorrente a mudanças e novas práticas.'],
+            'checklist' => ['Os valores são observáveis em decisões, rituais e comportamentos?', 'A liderança reforça a cultura desejada de forma consistente?', 'Os colaboradores sentem voz, clareza e segurança para contribuir?', 'Há evidências para priorizar as alavancas culturais mais críticas?'],
+            'deliverables' => ['Mapa da cultura actual', 'Relatório de forças e riscos culturais', 'Matriz de alinhamento valores-práticas', 'Plano de acção cultural'],
+        ],
+        [
             'slug' => 'carreira-sucessao',
             'title' => 'Planos de Carreira e Sucessão',
             'short' => 'Percursos de evolução, mapas de sucessão e preparação de talentos críticos para garantir continuidade.',
@@ -113,6 +123,16 @@ return [
             'alerts' => ['Objectives are unclear or change without criteria.', 'Performance conversations happen only at year-end.', 'Feedback is irregular or not actionable.', 'Weak connection between performance, development and rewards.'],
             'checklist' => ['Are individual objectives connected to company priorities?', 'Are feedback cycles regular and documented?', 'Do managers and employees understand the criteria?', 'Do results generate practical development plans?'],
             'deliverables' => ['Performance management model', 'Objectives and indicators matrix', 'Evaluation tools', 'Feedback and calibration guide'],
+        ],
+        [
+            'slug' => 'diagnostico-cultura-organizacional',
+            'title' => 'Organizational Culture Diagnosis',
+            'short' => 'Structured reading of values, behaviours, leadership, communication and practices that shape experience and performance.',
+            'value' => 'Organizational culture diagnosis reveals alignment and gaps between stated values, real practices and strategic objectives before proposing change.',
+            'audience' => 'Leadership and HR teams that need to understand the current culture, prepare change, reduce internal friction or strengthen alignment.',
+            'alerts' => ['Stated values are not visible in daily behaviour.', 'Silos, weak collaboration or friction between areas.', 'Inconsistent internal communication or low trust in leadership.', 'Recurring resistance to change and new practices.'],
+            'checklist' => ['Are values observable in decisions, rituals and behaviours?', 'Does leadership reinforce the desired culture consistently?', 'Do employees have voice, clarity and psychological safety to contribute?', 'Is there evidence to prioritise the most critical cultural levers?'],
+            'deliverables' => ['Current culture map', 'Cultural strengths and risks report', 'Values-practices alignment matrix', 'Culture action plan'],
         ],
         [
             'slug' => 'carreira-sucessao',

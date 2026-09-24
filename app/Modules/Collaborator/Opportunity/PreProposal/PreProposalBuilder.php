@@ -97,6 +97,9 @@ final class PreProposalBuilder
             'gestao-desempenho'              => $en
                 ? "{$client} seeks to build or improve a performance management system to align teams and organisational results."
                 : "A {$client} pretende estruturar ou melhorar o sistema de gestão de desempenho para alinhar equipas e resultados organizacionais.",
+            'diagnostico-cultura-organizacional' => $en
+                ? "{$client} seeks to understand its current culture, leadership practices and internal alignment before defining cultural priorities and change actions."
+                : "A {$client} pretende compreender a cultura actual, as práticas de liderança e o alinhamento interno antes de definir prioridades culturais e acções de mudança.",
             'carreira-sucessao'              => $en
                 ? "{$client} needs a career and succession plan that retains talent and ensures organisational continuity."
                 : "A {$client} necessita de um plano de carreira e sucessão que retenha talento e assegure a continuidade organizacional.",
@@ -179,6 +182,13 @@ final class PreProposalBuilder
                 ['num' => '04', 'label' => 'Shortlist & Report',  'text' => 'Presentation of finalist candidates with assessment report.'],
                 ['num' => '05', 'label' => 'Decision Support',    'text' => 'Support through the decision process and offer negotiation.'],
             ],
+            'diagnostico-cultura-organizacional' => [
+                ['num' => '01', 'label' => 'Align',      'text' => 'Confirm scope, stakeholders, confidentiality and communication plan.'],
+                ['num' => '02', 'label' => 'Listen',     'text' => 'Collect inputs through survey, interviews, focus groups and documents.'],
+                ['num' => '03', 'label' => 'Triangulate','text' => 'Compare values, practices, leadership signals and cultural risks.'],
+                ['num' => '04', 'label' => 'Prioritise', 'text' => 'Identify cultural strengths, tensions and priority levers.'],
+                ['num' => '05', 'label' => 'Activate',   'text' => 'Build the culture action plan with leadership.'],
+            ],
             default => [
                 ['num' => '01', 'label' => 'Diagnose',    'text' => 'Gather information and analyse the organisational context.'],
                 ['num' => '02', 'label' => 'Design',      'text' => 'Structure the solution adapted to the client\'s reality.'],
@@ -202,6 +212,13 @@ final class PreProposalBuilder
                 ['num' => '03', 'label' => 'Validação',              'text' => 'Workshops com liderança e validação do modelo proposto.'],
                 ['num' => '04', 'label' => 'Implementação',          'text' => 'Instalação do sistema, formação de avaliadores e comunicação interna.'],
                 ['num' => '05', 'label' => 'Monitorização',          'text' => 'Acompanhamento do primeiro ciclo de avaliação e ajustes necessários.'],
+            ],
+            'diagnostico-cultura-organizacional' => [
+                ['num' => '01', 'label' => 'Alinhamento',            'text' => 'Confirmação de escopo, stakeholders, confidencialidade e comunicação.'],
+                ['num' => '02', 'label' => 'Escuta',                 'text' => 'Recolha por questionário, entrevistas, focus groups e documentos.'],
+                ['num' => '03', 'label' => 'Triangulação',           'text' => 'Comparação entre valores, práticas, liderança e riscos culturais.'],
+                ['num' => '04', 'label' => 'Priorização',            'text' => 'Identificação de forças, tensões e alavancas culturais prioritárias.'],
+                ['num' => '05', 'label' => 'Activação',              'text' => 'Construção do plano de acção cultural com a liderança.'],
             ],
             'carreira-sucessao' => [
                 ['num' => '01', 'label' => 'Mapeamento',             'text' => 'Levantamento da estrutura organizacional e funções existentes.'],
@@ -269,7 +286,7 @@ final class PreProposalBuilder
                 'alta'    => '4 to 6 weeks after award',
                 default   => '4 to 8 weeks after award',
             },
-            'gestao-desempenho', 'carreira-sucessao' => '6 to 10 weeks after award',
+            'gestao-desempenho', 'carreira-sucessao', 'diagnostico-cultura-organizacional' => '6 to 10 weeks after award',
             default => '4 to 8 weeks after award',
         };
 
@@ -279,7 +296,7 @@ final class PreProposalBuilder
                 'alta'    => '4 a 6 semanas após adjudicação',
                 default   => '4 a 8 semanas após adjudicação',
             },
-            'gestao-desempenho', 'carreira-sucessao' => '6 a 10 semanas após adjudicação',
+            'gestao-desempenho', 'carreira-sucessao', 'diagnostico-cultura-organizacional' => '6 a 10 semanas após adjudicação',
             default => '4 a 8 semanas após adjudicação',
         };
     }
@@ -296,6 +313,22 @@ final class PreProposalBuilder
 
     private function buildDiagnosticBenefits(string $slug, bool $en = false): array
     {
+        if ($slug === 'diagnostico-cultura-organizacional') {
+            return $en ? [
+                'Proposal grounded in the real cultural context, not generic assumptions',
+                'Better calibration of confidentiality, sample, methods and communication',
+                'Identification of cultural strengths, tensions and change risks before pricing',
+                'Deliverables adapted to leadership alignment, employee voice and organisational maturity',
+                'Clearer basis for a practical culture action plan',
+            ] : [
+                'Proposta baseada no contexto cultural real, não em pressupostos genéricos',
+                'Melhor calibração de confidencialidade, amostra, métodos e comunicação',
+                'Identificação de forças culturais, tensões e riscos de mudança antes da proposta',
+                'Entregáveis adaptados ao alinhamento da liderança, voz dos colaboradores e maturidade organizacional',
+                'Base mais clara para um plano de acção cultural prático',
+            ];
+        }
+
         return $en ? [
             'Proposal with values specific to the organisational context',
             'Methodology calibrated to the identified maturity level and urgency',

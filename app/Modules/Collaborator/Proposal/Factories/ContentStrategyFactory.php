@@ -4,6 +4,7 @@ namespace App\Modules\Collaborator\Proposal\Factories;
 
 use App\Modules\Collaborator\Proposal\Contracts\ServiceContentStrategy;
 use App\Modules\Collaborator\Proposal\Strategies\DefaultContentStrategy;
+use App\Modules\Collaborator\Proposal\Strategies\DiagnosticoCulturaOrganizacionalStrategy;
 use App\Modules\Collaborator\Proposal\Strategies\DigitalizacaoRhStrategy;
 use App\Modules\Collaborator\Proposal\Strategies\GestaoDesempenhoStrategy;
 use App\Modules\Collaborator\Proposal\Strategies\RecrutamentoSeleccaoStrategy;
@@ -15,6 +16,7 @@ class ContentStrategyFactory
         return match ($slug) {
             'recrutamento-seleccao'          => new RecrutamentoSeleccaoStrategy(),
             'gestao-desempenho'              => new GestaoDesempenhoStrategy(),
+            'diagnostico-cultura-organizacional' => new DiagnosticoCulturaOrganizacionalStrategy(),
             'digitalizacao-rh-endomarketing' => new DigitalizacaoRhStrategy(),
             default                          => new DefaultContentStrategy(),
         };
