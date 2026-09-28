@@ -22,7 +22,7 @@ class ContactController extends Controller
     private function save(StoreContactRequest $request, string $locale): RedirectResponse
     {
         $message = ContactMessage::create([
-            ...$request->safe()->except('website'),
+            ...$request->safe()->except(['website', 'form_started_at', 'cf-turnstile-response']),
             'locale' => $locale,
             'ip_address' => $request->ip(),
         ]);

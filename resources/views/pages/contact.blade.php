@@ -13,6 +13,11 @@
             ? "Hello BD,\n\nI completed the quick diagnostic for {$serviceLabel} and the result was: {$diagnostic}.\n\nI would like to discuss the next steps."
             : "Olá BD,\n\nFiz o diagnóstico rápido para {$serviceLabel} e o resultado foi: {$diagnostic}.\n\nGostaria de discutir os próximos passos.")
         : '';
+    $formStartedAt = \Illuminate\Support\Facades\Crypt::encryptString((string) microtime(true));
+    $showTurnstile = (bool) config('services.turnstile.enabled')
+        && filled(config('services.turnstile.site_key'))
+        && filled(config('services.turnstile.secret_key'));
+    $turnstileSiteKey = config('services.turnstile.site_key');
 @endphp
 <section class="page-hero inner-hero inner-hero-contact"><div class="container inner-hero-grid">
     <div class="inner-hero-copy"><span class="eyebrow light">{{ $en ? 'START HERE' : 'COMECE AQUI' }}</span><h1>{{ $en ? 'Your next people decision can start with one conversation.' : 'A sua próxima decisão sobre pessoas pode começar com uma conversa.' }}</h1><p>{{ $en ? 'Choose the easiest way to reach us. We are ready to understand the challenge.' : 'Escolha a forma mais simples de falar connosco. Estamos prontos para compreender o desafio.' }}</p></div>
@@ -35,12 +40,19 @@
     @if ($errors->any())<div class="alert-error" role="alert">{{ $en ? 'Please review the highlighted fields.' : 'Por favor, reveja os campos assinalados.' }}</div>@endif
     <form method="POST" action="{{ route($en ? 'en.contact.store' : 'contact.store') }}" class="contact-form">
         @csrf
-        <div class="honeypot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <input type="hidden" name="form_started_at" value="{{ $formStartedAt }}">
+        <div class="honeypot" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
         <div class="field-row"><label><span>{{ $en ? 'Name' : 'Nome' }} *</span><input name="name" value="{{ old('name') }}" required autocomplete="name" @class(['invalid' => $errors->has('name')])>@error('name')<small>{{ $message }}</small>@enderror</label><label><span>Email *</span><input type="email" name="email" value="{{ old('email') }}" required autocomplete="email" @class(['invalid' => $errors->has('email')])>@error('email')<small>{{ $message }}</small>@enderror</label></div>
         <div class="field-row"><label><span>{{ $en ? 'Phone' : 'Telefone' }}</span><input name="phone" value="{{ old('phone') }}" autocomplete="tel"></label><label><span>{{ $en ? 'Company' : 'Empresa' }}</span><input name="company" value="{{ old('company') }}" autocomplete="organization"></label></div>
         <label><span>{{ $en ? 'Subject' : 'Assunto' }} *</span><input name="subject" value="{{ old('subject', request('subject') ?? request('service')) }}" required @class(['invalid' => $errors->has('subject')])>@error('subject')<small>{{ $message }}</small>@enderror</label>
         <label><span>{{ $en ? 'How can we help?' : 'Como podemos ajudar?' }} *</span><textarea name="message" rows="6" required @class(['invalid' => $errors->has('message')])>{{ old('message', $diagnosticMessage) }}</textarea>@error('message')<small>{{ $message }}</small>@enderror</label>
+        @if ($showTurnstile)
+            <div class="turnstile-field"><div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}"></div></div>
+        @endif
         <button class="button button-primary" type="submit">{{ $en ? 'Send message' : 'Enviar mensagem' }} →</button>
     </form>
 </div></div></section>
+@if ($showTurnstile)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 @endsection

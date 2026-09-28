@@ -5,6 +5,8 @@ return [
     'email' => 'O campo :attribute deve conter um endereço de email válido.',
     'max' => ['string' => 'O campo :attribute não pode ter mais de :max caracteres.'],
     'min' => ['string' => 'O campo :attribute deve ter pelo menos :min caracteres.'],
+    'regex' => 'O campo :attribute tem um formato inválido.',
+    'not_regex' => 'O campo :attribute tem um formato inválido.',
     'attributes' => [
         'name' => 'nome',
         'email' => 'email',

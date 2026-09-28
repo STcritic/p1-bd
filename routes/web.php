@@ -37,7 +37,7 @@ Route::post('/agenda', [AppointmentController::class, 'store'])
     ->name('schedule.store');
 Route::get('/contactos', [PageController::class, 'contact'])->name('contact');
 Route::post('/contactos', [ContactController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:5,10')
     ->name('contact.store');
 
 Route::get('/propostas/verificar/{token}', [ProposalVerificationController::class, 'show'])
@@ -158,7 +158,7 @@ Route::prefix('en')->name('en.')->group(function (): void {
         ->name('schedule.store');
     Route::get('/contact', [PageController::class, 'contactEn'])->name('contact');
     Route::post('/contact', [ContactController::class, 'storeEn'])
-        ->middleware('throttle:5,1')
+        ->middleware('throttle:5,10')
         ->name('contact.store');
 });
 
