@@ -92,7 +92,13 @@ class StoreContactRequest extends FormRequest
 
     private function checkTurnstile(Validator $validator): void
     {
-        if (! $this->turnstileEnabled()) {
+        if (! (bool) config('services.turnstile.enabled', false)) {
+            return;
+        }
+
+        if (! $this->turnstileConfigured()) {
+            Log::warning('Turnstile is enabled but not configured with usable keys.');
+
             return;
         }
 
@@ -131,11 +137,17 @@ class StoreContactRequest extends FormRequest
         }
     }
 
-    private function turnstileEnabled(): bool
+    private function turnstileConfigured(): bool
     {
-        return (bool) config('services.turnstile.enabled', false)
-            && filled(config('services.turnstile.site_key'))
-            && filled(config('services.turnstile.secret_key'));
+        return $this->usableTurnstileValue(config('services.turnstile.site_key'))
+            && $this->usableTurnstileValue(config('services.turnstile.secret_key'));
+    }
+
+    private function usableTurnstileValue(mixed $value): bool
+    {
+        $value = trim((string) $value);
+
+        return $value !== '' && $value !== '...';
     }
 
     private function flagSpam(Validator $validator, string $reason, ?string $message = null, bool $silent = false): void
