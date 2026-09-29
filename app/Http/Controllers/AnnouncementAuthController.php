@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AnnouncementAdmin;
 use App\Support\AnnouncementMasterAccess;
+use App\Services\TurnstileVerifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,14 +20,35 @@ use Throwable;
 class AnnouncementAuthController extends Controller
 {
     private const RESET_TOKEN_MINUTES = 60;
+    private const LOGIN_TURNSTILE_AFTER_FAILURES = 2;
 
-    public function showLogin(): View
+    public function showLogin(Request $request): View
     {
-        return view('announcements.login');
+        return view('announcements.login', [
+            'requiresTurnstile' => $this->loginRequiresTurnstile($request),
+        ]);
     }
 
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request, TurnstileVerifier $turnstile): RedirectResponse
     {
+        if (filled($request->input('website'))) {
+            $this->logAuthSecurityEvent($request, 'login_honeypot');
+
+            throw ValidationException::withMessages([
+                'bd_access_email' => 'Credenciais inválidas para gerir anúncios.',
+            ]);
+        }
+
+        if ($this->loginRequiresTurnstile($request)) {
+            $turnstileReason = $turnstile->verify($request, 'announcement_login');
+
+            if ($turnstileReason !== null) {
+                throw ValidationException::withMessages([
+                    'bd_access_email' => $this->securityMessage('pt', $turnstileReason),
+                ]);
+            }
+        }
+
         $credentials = $request->validate([
             'bd_access_email' => ['required', 'email'],
             'bd_access_secret' => ['required', 'string'],
@@ -40,6 +62,8 @@ class AnnouncementAuthController extends Controller
             ->first();
 
         if (! $admin || ! Hash::check($credentials['bd_access_secret'], $admin->password)) {
+            $this->registerFailedLogin($request);
+
             throw ValidationException::withMessages([
                 'bd_access_email' => 'Credenciais inválidas para gerir anúncios.',
             ]);
@@ -52,6 +76,7 @@ class AnnouncementAuthController extends Controller
         }
 
         $request->session()->regenerate();
+        $request->session()->forget('announcement_login_failures');
         $request->session()->put('announcement_admin_id', $admin->id);
 
         $admin->update(['last_login_at' => now()]);
@@ -59,15 +84,32 @@ class AnnouncementAuthController extends Controller
         return redirect()->route('announcements.dashboard');
     }
 
-    public function showPasswordResetRequest(): View
+    public function showPasswordResetRequest(TurnstileVerifier $turnstile): View
     {
         app(AnnouncementMasterAccess::class)->ensure();
 
-        return view('announcements.password-reset');
+        return view('announcements.password-reset', [
+            'showTurnstile' => $turnstile->shouldRender(),
+            'turnstileSiteKey' => $turnstile->siteKey(),
+        ]);
     }
 
-    public function sendPasswordResetLink(Request $request): RedirectResponse
+    public function sendPasswordResetLink(Request $request, TurnstileVerifier $turnstile): RedirectResponse
     {
+        if (filled($request->input('website'))) {
+            $this->logAuthSecurityEvent($request, 'password_reset_honeypot');
+
+            return back()->with('status', 'Se existir uma conta para este email, receberá um link de restauro.');
+        }
+
+        $turnstileReason = $turnstile->verify($request, 'announcement_password_reset');
+
+        if ($turnstileReason !== null) {
+            throw ValidationException::withMessages([
+                'bd_access_email' => $this->securityMessage('pt', $turnstileReason),
+            ]);
+        }
+
         $data = $request->validate([
             'bd_access_email' => ['required', 'email'],
         ]);
@@ -183,6 +225,42 @@ class AnnouncementAuthController extends Controller
         return redirect()
             ->route('announcements.dashboard')
             ->with('status', 'Palavra-passe actualizada. O novo prazo de validade é de 6 meses.');
+    }
+
+    private function loginRequiresTurnstile(Request $request): bool
+    {
+        return (int) $request->session()->get('announcement_login_failures', 0) >= self::LOGIN_TURNSTILE_AFTER_FAILURES;
+    }
+
+    private function registerFailedLogin(Request $request): void
+    {
+        $failures = (int) $request->session()->get('announcement_login_failures', 0) + 1;
+        $request->session()->put('announcement_login_failures', $failures);
+
+        Log::notice('Announcement login failed.', [
+            'ip' => $request->ip(),
+            'failures' => $failures,
+            'email_hash' => hash('sha256', strtolower(trim((string) $request->input('bd_access_email')))),
+            'user_agent' => substr((string) $request->userAgent(), 0, 255),
+        ]);
+    }
+
+    private function securityMessage(string $locale, string $reason): string
+    {
+        return match ($reason) {
+            'missing_turnstile', 'turnstile_failed' => 'Não foi possível validar a protecção anti-spam. Recarregue a página e tente novamente.',
+            default => 'Não foi possível validar esta submissão. Tente novamente.',
+        };
+    }
+
+    private function logAuthSecurityEvent(Request $request, string $reason): void
+    {
+        Log::notice('Announcement auth submission blocked as suspicious.', [
+            'reason' => $reason,
+            'ip' => $request->ip(),
+            'route' => $request->route()?->getName(),
+            'user_agent' => substr((string) $request->userAgent(), 0, 255),
+        ]);
     }
 
     public function logout(Request $request): RedirectResponse

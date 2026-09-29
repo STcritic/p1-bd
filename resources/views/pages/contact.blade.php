@@ -14,13 +14,9 @@
             : "Olá BD,\n\nFiz o diagnóstico rápido para {$serviceLabel} e o resultado foi: {$diagnostic}.\n\nGostaria de discutir os próximos passos.")
         : '';
     $formStartedAt = \Illuminate\Support\Facades\Crypt::encryptString((string) microtime(true));
-    $turnstileSiteKey = trim((string) config('services.turnstile.site_key'));
-    $turnstileSecretKey = trim((string) config('services.turnstile.secret_key'));
-    $showTurnstile = (bool) config('services.turnstile.enabled')
-        && $turnstileSiteKey !== ''
-        && $turnstileSecretKey !== ''
-        && $turnstileSiteKey !== '...'
-        && $turnstileSecretKey !== '...';
+    $turnstile = app(\App\Services\TurnstileVerifier::class);
+    $showTurnstile = $turnstile->shouldRender();
+    $turnstileSiteKey = $turnstile->siteKey();
 @endphp
 <section class="page-hero inner-hero inner-hero-contact"><div class="container inner-hero-grid">
     <div class="inner-hero-copy"><span class="eyebrow light">{{ $en ? 'START HERE' : 'COMECE AQUI' }}</span><h1>{{ $en ? 'Your next people decision can start with one conversation.' : 'A sua próxima decisão sobre pessoas pode começar com uma conversa.' }}</h1><p>{{ $en ? 'Choose the easiest way to reach us. We are ready to understand the challenge.' : 'Escolha a forma mais simples de falar connosco. Estamos prontos para compreender o desafio.' }}</p></div>

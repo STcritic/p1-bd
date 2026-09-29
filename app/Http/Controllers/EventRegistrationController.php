@@ -3,15 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\CompanyEvent;
+use App\Services\TurnstileVerifier;
 use App\Services\WebsiteNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EventRegistrationController extends Controller
 {
-    public function store(Request $request, CompanyEvent $event): RedirectResponse
+    public function store(Request $request, CompanyEvent $event, TurnstileVerifier $turnstile): RedirectResponse
     {
         abort_unless($event->is_active, 404);
+
+        if (filled($request->input('website'))) {
+            Log::notice('Event registration blocked as suspicious.', [
+                'reason' => 'honeypot',
+                'event_id' => $event->id,
+                'ip' => $request->ip(),
+                'user_agent' => substr((string) $request->userAgent(), 0, 255),
+            ]);
+
+            return back()->with('status', 'Inscrição recebida. A equipa BD entrará em contacto para confirmação.');
+        }
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:190'],
@@ -21,8 +34,20 @@ class EventRegistrationController extends Controller
             'position' => ['nullable', 'string', 'max:190'],
             'seats_requested' => ['required', 'integer', 'min:1', 'max:20'],
             'notes' => ['nullable', 'string', 'max:1200'],
-            'website' => ['nullable', 'max:0'],
         ]);
+
+
+        $turnstileReason = $turnstile->verify($request, 'event_registration');
+
+        if ($turnstileReason !== null) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'event_security' => $request->routeIs('en.*')
+                        ? 'We could not validate the anti-spam check. Please reload the page and try again.'
+                        : 'Não foi possível validar a protecção anti-spam. Recarregue a página e tente novamente.',
+                ]);
+        }
 
         $requestedSeats = (int) $data['seats_requested'];
         $remainingSeats = $event->remainingSeats();

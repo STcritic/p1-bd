@@ -2,6 +2,11 @@
 @section('title', 'Área do Colaborador')
 
 @section('content')
+@php
+    $turnstile = app(\App\Services\TurnstileVerifier::class);
+    $showTurnstile = ($requiresTurnstile ?? false) && $turnstile->shouldRender();
+    $turnstileSiteKey = $turnstile->siteKey();
+@endphp
 <main class="announcement-login">
     <div class="bd-login-orb" data-bd-login-orb aria-hidden="true"><span>BD</span></div>
     <a class="bd-access-back" href="{{ route('home') }}">← Voltar ao website</a>
@@ -27,6 +32,7 @@
 
         <form method="POST" action="{{ route('announcements.login.store') }}" class="bd-access-form" autocomplete="off">
             @csrf
+            <div class="honeypot" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
             <label>
                 <span>Email</span>
                 <input
@@ -55,6 +61,9 @@
                     data-clear-secret>
                 @error('bd_access_secret')<small>{{ $message }}</small>@enderror
             </label>
+            @if ($showTurnstile)
+                <div class="turnstile-field"><div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}"></div></div>
+            @endif
             <button class="button button-primary" type="submit">Entrar na gestão <span>→</span></button>
         </form>
 
@@ -72,5 +81,8 @@
     });
 
 </script>
+@if ($showTurnstile)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 @include('announcements.partials.login-orb-script')
 @endsection

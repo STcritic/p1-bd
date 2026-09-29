@@ -7,6 +7,9 @@
     $en = $locale === 'en';
     $remainingSeats = $event->remainingSeats();
     $registrationOpen = $event->registrationOpen();
+    $turnstile = app(\App\Services\TurnstileVerifier::class);
+    $showTurnstile = $turnstile->shouldRender();
+    $turnstileSiteKey = $turnstile->siteKey();
 @endphp
 
 <section class="event-detail-hero">
@@ -58,13 +61,13 @@
             <div class="alert-success" role="status">{{ session('status') }}</div>
         @endif
         @if ($errors->any())
-            <div class="alert-error" role="alert">{{ $en ? 'Please review the form fields.' : 'Revise os campos do formulário.' }}</div>
+            <div class="alert-error" role="alert">{{ $errors->first() ?: ($en ? 'Please review the form fields.' : 'Revise os campos do formulário.') }}</div>
         @endif
 
         @if ($registrationOpen)
             <form method="POST" action="{{ route($en ? 'en.events.register' : 'events.register', $event) }}" class="contact-form event-registration-form">
                 @csrf
-                <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
+                <div class="honeypot" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
                 <label><span>{{ $en ? 'Full name' : 'Nome completo' }} *</span><input name="name" value="{{ old('name') }}" required>@error('name')<small>{{ $message }}</small>@enderror</label>
                 <div class="field-row">
                     <label><span>Email *</span><input type="email" name="email" value="{{ old('email') }}" required>@error('email')<small>{{ $message }}</small>@enderror</label>
@@ -76,6 +79,9 @@
                 </div>
                 <label><span>{{ $en ? 'Seats requested' : 'Número de participantes' }} *</span><input type="number" name="seats_requested" min="1" max="20" value="{{ old('seats_requested', 1) }}" required>@error('seats_requested')<small>{{ $message }}</small>@enderror</label>
                 <label><span>{{ $en ? 'Notes' : 'Observações' }}</span><textarea name="notes" rows="4">{{ old('notes') }}</textarea>@error('notes')<small>{{ $message }}</small>@enderror</label>
+                @if ($showTurnstile)
+                    <div class="turnstile-field"><div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}"></div></div>
+                @endif
                 <button class="button button-primary" type="submit">{{ $en ? 'Submit registration' : 'Enviar inscrição' }} <span>→</span></button>
             </form>
         @else
@@ -83,4 +89,7 @@
         @endif
     </aside>
 </div></section>
+@if ($showTurnstile)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 @endsection

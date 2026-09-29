@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Modules\Collaborator\Opportunity\Actions\SubmitDiagnostic;
+use App\Services\TurnstileVerifier;
 use App\Modules\Collaborator\Opportunity\Domain\DiagnosticSession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 /**
@@ -93,7 +95,7 @@ class DiagnosticPortalController extends Controller
 
     // ── Submit ────────────────────────────────────────────────────────────────
 
-    public function submit(Request $request, string $token, SubmitDiagnostic $action): RedirectResponse
+    public function submit(Request $request, string $token, SubmitDiagnostic $action, TurnstileVerifier $turnstile): RedirectResponse
     {
         $session = DiagnosticSession::where('token', $token)
             ->with('opportunity')
@@ -102,6 +104,25 @@ class DiagnosticPortalController extends Controller
         if (! $session->isOpen()) {
             return redirect()->route('diagnostic.portal', $token)
                 ->withErrors(['form' => 'Sessão expirada. Contacte a BD para um novo link.']);
+        }
+
+        if (filled($request->input('website'))) {
+            Log::notice('Diagnostic submission blocked as suspicious.', [
+                'reason' => 'honeypot',
+                'session_id' => $session->id,
+                'ip' => $request->ip(),
+                'user_agent' => substr((string) $request->userAgent(), 0, 255),
+            ]);
+
+            return redirect()->route('diagnostic.portal', $token);
+        }
+
+        $turnstileReason = $turnstile->verify($request, 'diagnostic_submit');
+
+        if ($turnstileReason !== null) {
+            return redirect()->route('diagnostic.portal', $token)
+                ->withInput($request->except(['cf-turnstile-response']))
+                ->withErrors(['form' => $this->securityMessage($lang, $turnstileReason)]);
         }
 
         $guide = config(
@@ -113,7 +134,7 @@ class DiagnosticPortalController extends Controller
         $rules = $this->buildValidationRules($guide);
         $request->validate($rules);
 
-        $answers = $request->except(['_token', '_method']);
+        $answers = $request->except(['_token', '_method', 'website', 'cf-turnstile-response']);
         $files   = collect($request->allFiles())
             ->mapWithKeys(fn ($file, $key) => [$key => $file])
             ->toArray();
@@ -125,6 +146,20 @@ class DiagnosticPortalController extends Controller
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private function securityMessage(string $lang, string $reason): string
+    {
+        $en = $lang === 'en';
+
+        return match ($reason) {
+            'missing_turnstile', 'turnstile_failed' => $en
+                ? 'We could not validate the anti-spam check. Please reload the page and try again.'
+                : 'Não foi possível validar a protecção anti-spam. Recarregue a página e tente novamente.',
+            default => $en
+                ? 'We could not validate this submission. Please try again.'
+                : 'Não foi possível validar esta submissão. Tente novamente.',
+        };
+    }
 
     private function buildValidationRules(array $guide): array
     {

@@ -26,18 +26,18 @@ Route::get('/recursos/{guide}', [PageController::class, 'resource'])->name('reso
 Route::get('/eventos', [PageController::class, 'events'])->name('events');
 Route::get('/eventos/{event:slug}', [PageController::class, 'event'])->name('events.show');
 Route::post('/eventos/{event:slug}/inscricao', [EventRegistrationController::class, 'store'])
-    ->middleware('throttle:6,1')
+    ->middleware('throttle:event-registration')
     ->name('events.register');
 Route::get('/agenda', [AppointmentController::class, 'show'])->name('schedule.show');
 Route::get('/agenda/horarios', [AppointmentController::class, 'slots'])
     ->middleware('throttle:30,1')
     ->name('schedule.slots');
 Route::post('/agenda', [AppointmentController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:schedule-booking')
     ->name('schedule.store');
 Route::get('/contactos', [PageController::class, 'contact'])->name('contact');
 Route::post('/contactos', [ContactController::class, 'store'])
-    ->middleware('throttle:5,10')
+    ->middleware('throttle:contact-form')
     ->name('contact.store');
 
 Route::get('/propostas/verificar/{token}', [ProposalVerificationController::class, 'show'])
@@ -47,11 +47,11 @@ Route::get('/propostas/verificar/{token}/qr.svg', [ProposalVerificationControlle
 
 Route::get('/area-colaborador', [AnnouncementAuthController::class, 'showLogin'])->name('announcements.login');
 Route::post('/area-colaborador', [AnnouncementAuthController::class, 'login'])
-    ->middleware('throttle:6,1')
+    ->middleware('throttle:announcement-login')
     ->name('announcements.login.store');
 Route::get('/area-colaborador/restaurar-senha', [AnnouncementAuthController::class, 'showPasswordResetRequest'])->name('announcements.password.expired');
 Route::post('/area-colaborador/restaurar-senha', [AnnouncementAuthController::class, 'sendPasswordResetLink'])
-    ->middleware('throttle:6,1')
+    ->middleware('throttle:announcement-password-reset')
     ->name('announcements.password.expired.store');
 Route::get('/area-colaborador/nova-senha/{token}', [AnnouncementAuthController::class, 'showPasswordResetForm'])->name('announcements.password.reset');
 Route::post('/area-colaborador/nova-senha', [AnnouncementAuthController::class, 'updatePasswordFromToken'])
@@ -135,8 +135,8 @@ Route::prefix('diagnostico')
     ->name('diagnostic.')
     ->group(function (): void {
         Route::get('/{token}',          [DiagnosticPortalController::class, 'show'])->name('portal');
-        Route::post('/{token}/guardar', [DiagnosticPortalController::class, 'save'])->name('save');
-        Route::post('/{token}/submeter',[DiagnosticPortalController::class, 'submit'])->name('submit');
+        Route::post('/{token}/guardar', [DiagnosticPortalController::class, 'save'])->middleware('throttle:diagnostic-save')->name('save');
+        Route::post('/{token}/submeter',[DiagnosticPortalController::class, 'submit'])->middleware('throttle:diagnostic-submit')->name('submit');
     });
 
 Route::prefix('en')->name('en.')->group(function (): void {
@@ -147,18 +147,18 @@ Route::prefix('en')->name('en.')->group(function (): void {
     Route::get('/events', [PageController::class, 'eventsEn'])->name('events');
     Route::get('/events/{event:slug}', [PageController::class, 'eventEn'])->name('events.show');
     Route::post('/events/{event:slug}/registration', [EventRegistrationController::class, 'store'])
-        ->middleware('throttle:6,1')
+        ->middleware('throttle:event-registration')
         ->name('events.register');
     Route::get('/schedule', [AppointmentController::class, 'show'])->name('schedule.show');
     Route::get('/schedule/slots', [AppointmentController::class, 'slots'])
         ->middleware('throttle:30,1')
         ->name('schedule.slots');
     Route::post('/schedule', [AppointmentController::class, 'store'])
-        ->middleware('throttle:5,1')
+        ->middleware('throttle:schedule-booking')
         ->name('schedule.store');
     Route::get('/contact', [PageController::class, 'contactEn'])->name('contact');
     Route::post('/contact', [ContactController::class, 'storeEn'])
-        ->middleware('throttle:5,10')
+        ->middleware('throttle:contact-form')
         ->name('contact.store');
 });
 

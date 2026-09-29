@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator as ValidationContract;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Http;
+use App\Services\TurnstileVerifier;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Validator;
 use Throwable;
@@ -92,62 +92,11 @@ class StoreContactRequest extends FormRequest
 
     private function checkTurnstile(Validator $validator): void
     {
-        if (! (bool) config('services.turnstile.enabled', false)) {
-            return;
+        $reason = app(TurnstileVerifier::class)->verify($this, 'contact_form');
+
+        if ($reason !== null) {
+            $this->flagSpam($validator, $reason, $this->securityMessage($reason));
         }
-
-        if (! $this->turnstileConfigured()) {
-            Log::warning('Turnstile is enabled but not configured with usable keys.');
-
-            return;
-        }
-
-        $token = $this->input('cf-turnstile-response');
-
-        if (! is_string($token) || trim($token) === '') {
-            $this->flagSpam($validator, 'missing_turnstile', $this->securityMessage('missing_turnstile'));
-
-            return;
-        }
-
-        try {
-            $response = Http::asForm()
-                ->timeout((float) config('services.turnstile.timeout', 4))
-                ->post(config('services.turnstile.verify_url'), [
-                    'secret' => config('services.turnstile.secret_key'),
-                    'response' => $token,
-                    'remoteip' => $this->ip(),
-                ]);
-        } catch (Throwable $exception) {
-            Log::warning('Turnstile verification unavailable.', [
-                'message' => $exception->getMessage(),
-            ]);
-
-            return;
-        }
-
-        if (! $response->ok() || ! (bool) $response->json('success')) {
-            $this->flagSpam($validator, 'turnstile_failed', $this->securityMessage('turnstile_failed'));
-
-            Log::notice('Turnstile verification failed.', [
-                'ip' => $this->ip(),
-                'status' => $response->status(),
-                'errors' => $response->json('error-codes'),
-            ]);
-        }
-    }
-
-    private function turnstileConfigured(): bool
-    {
-        return $this->usableTurnstileValue(config('services.turnstile.site_key'))
-            && $this->usableTurnstileValue(config('services.turnstile.secret_key'));
-    }
-
-    private function usableTurnstileValue(mixed $value): bool
-    {
-        $value = trim((string) $value);
-
-        return $value !== '' && $value !== '...';
     }
 
     private function flagSpam(Validator $validator, string $reason, ?string $message = null, bool $silent = false): void

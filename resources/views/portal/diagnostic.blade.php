@@ -1,4 +1,9 @@
-@php $en = ($lang ?? 'pt') === 'en'; @endphp
+@php
+    $en = ($lang ?? 'pt') === 'en';
+    $turnstile = app(\App\Services\TurnstileVerifier::class);
+    $showTurnstile = $turnstile->shouldRender();
+    $turnstileSiteKey = $turnstile->siteKey();
+@endphp
 <!DOCTYPE html>
 <html lang="{{ $lang ?? 'pt' }}">
 <head>
@@ -37,6 +42,9 @@
             <span>{{ $en ? 'Organisation' : 'Organização' }}: <strong>{{ $opportunity->client_name }}</strong></span>
             <span>{{ $en ? 'Service' : 'Serviço' }}: <strong>{{ $opportunity->service_title }}</strong></span>
         </div>
+        @if ($errors->any())
+            <div class="alert-error" role="alert">{{ $errors->first() }}</div>
+        @endif
     </section>
 
     {{-- Progress bar --}}
@@ -49,6 +57,7 @@
     <form action="{{ route('diagnostic.submit', $session->token) }}" method="POST"
           id="diagnosticForm" enctype="multipart/form-data" class="portal-form" novalidate>
         @csrf
+        <div class="honeypot" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
 
         @foreach($guide['groups'] as $groupIndex => $group)
             @php
@@ -201,9 +210,14 @@
             <p class="portal-autosave-status" id="autosaveStatus">
                 {{ $en ? 'Progress is saved automatically.' : 'O progresso é guardado automaticamente.' }}
             </p>
-            <button type="submit" class="portal-submit-btn" id="submitBtn">
-                {{ $en ? 'Submit diagnostic →' : 'Submeter diagnóstico →' }}
-            </button>
+            <div>
+                @if ($showTurnstile)
+                    <div class="turnstile-field"><div class="cf-turnstile" data-diagnostic-turnstile data-sitekey="{{ $turnstileSiteKey }}" data-execution="execute" data-appearance="interaction-only" data-callback="onDiagnosticTurnstileSuccess" data-error-callback="onDiagnosticTurnstileError" data-expired-callback="onDiagnosticTurnstileExpired"></div></div>
+                @endif
+                <button type="submit" class="portal-submit-btn" id="submitBtn">
+                    {{ $en ? 'Submit diagnostic →' : 'Submeter diagnóstico →' }}
+                </button>
+            </div>
         </div>
     </form>
 
@@ -218,6 +232,7 @@
     const SAVE_URL = '{{ route('diagnostic.save', $session->token) }}';
     const CSRF     = document.querySelector('meta[name="csrf-token"]').content;
     const IS_EN    = {{ $en ? 'true' : 'false' }};
+    const TURNSTILE_ENABLED = @json($showTurnstile);
 
     // ── Conditional display ───────────────────────────────────────────────────
     function getFieldValues() {
@@ -288,7 +303,7 @@
         const data = new FormData(form);
         const ans  = {};
         for (const [k, v] of data.entries()) {
-            if (!k.startsWith('_') && !k.includes('ficheiro') && !k.includes('file') && !k.includes('documento')) {
+            if (!k.startsWith('_') && k !== 'website' && k !== 'cf-turnstile-response' && !k.includes('ficheiro') && !k.includes('file') && !k.includes('documento')) {
                 ans[k] = v;
             }
         }
@@ -337,7 +352,38 @@
     });
 
     // ── Submit guard ──────────────────────────────────────────────────────────
-    document.getElementById('diagnosticForm').addEventListener('submit', function () {
+    const diagnosticForm = document.getElementById('diagnosticForm');
+    const diagnosticTurnstile = diagnosticForm.querySelector('[data-diagnostic-turnstile]');
+    let submittingAfterTurnstile = false;
+
+    const submitAfterTurnstile = () => {
+        submittingAfterTurnstile = true;
+        if (typeof diagnosticForm.requestSubmit === 'function') {
+            diagnosticForm.requestSubmit();
+        } else {
+            diagnosticForm.submit();
+        }
+    };
+
+    window.onDiagnosticTurnstileSuccess = submitAfterTurnstile;
+    window.onDiagnosticTurnstileError = submitAfterTurnstile;
+    window.onDiagnosticTurnstileExpired = () => {
+        if (window.turnstile && diagnosticTurnstile) window.turnstile.reset(diagnosticTurnstile);
+    };
+
+    diagnosticForm.addEventListener('submit', function (event) {
+        if (TURNSTILE_ENABLED && !submittingAfterTurnstile) {
+            const responseField = diagnosticForm.querySelector('input[name="cf-turnstile-response"]');
+            if (!responseField || !responseField.value) {
+                if (window.turnstile && diagnosticTurnstile) {
+                    event.preventDefault();
+                    window.turnstile.execute(diagnosticTurnstile);
+                    return;
+                }
+            }
+        }
+
+        submittingAfterTurnstile = false;
         document.getElementById('submitBtn').disabled = true;
         document.getElementById('submitBtn').textContent = IS_EN ? 'Submitting…' : 'A enviar…';
     });
@@ -348,6 +394,9 @@
     refreshConditions();
 })();
 </script>
+@if ($showTurnstile)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 
 </body>
 </html>

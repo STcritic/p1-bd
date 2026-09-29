@@ -9,6 +9,9 @@
     $oldScheduledFor = old('scheduled_for');
     $oldDate = $oldScheduledFor ? \Illuminate\Support\Carbon::parse($oldScheduledFor)->format('Y-m-d') : '';
     $oldTime = $oldScheduledFor ? \Illuminate\Support\Carbon::parse($oldScheduledFor)->format('H:i') : '';
+    $turnstile = app(\App\Services\TurnstileVerifier::class);
+    $showTurnstile = $turnstile->shouldRender();
+    $turnstileSiteKey = $turnstile->siteKey();
 @endphp
 
 <section class="schedule-hero">
@@ -25,13 +28,13 @@
                 <div class="alert-success" role="status">{{ session('status') }}</div>
             @endif
             @if ($errors->any())
-                <div class="alert-error" role="alert">{{ $en ? 'Please review the form fields.' : 'Por favor, reveja os campos do formulário.' }}</div>
+                <div class="alert-error" role="alert">{{ $errors->first() ?: ($en ? 'Please review the form fields.' : 'Por favor, reveja os campos do formulário.') }}</div>
             @endif
 
             @if ($setting->is_active && $setting->meeting_url)
                 <form method="POST" action="{{ route($en ? 'en.schedule.store' : 'schedule.store') }}" class="contact-form schedule-form" data-schedule-form data-slots-url="{{ route($en ? 'en.schedule.slots' : 'schedule.slots') }}" data-old-time="{{ $oldTime }}">
                     @csrf
-                    <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
+                    <div class="honeypot" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
                     <div class="field-row">
                         <label><span>{{ $en ? 'Name' : 'Nome' }} *</span><input name="name" value="{{ old('name') }}" required autocomplete="name">@error('name')<small>{{ $message }}</small>@enderror</label>
                         <label><span>Email *</span><input type="email" name="email" value="{{ old('email') }}" required autocomplete="email">@error('email')<small>{{ $message }}</small>@enderror</label>
@@ -49,6 +52,9 @@
                     <p class="schedule-form-note">{{ $en ? 'Only available times are shown.' : 'Apenas aparecem horários disponíveis.' }}</p>
                     <label><span>{{ $en ? 'Subject' : 'Assunto' }}</span><input name="subject" value="{{ old('subject', $setting->standard_subject) }}">@error('subject')<small>{{ $message }}</small>@enderror</label>
                     <label><span>{{ $en ? 'Context' : 'Contexto da conversa' }}</span><textarea name="message" rows="4">{{ old('message') }}</textarea>@error('message')<small>{{ $message }}</small>@enderror</label>
+                    @if ($showTurnstile)
+                        <div class="turnstile-field"><div class="cf-turnstile" data-schedule-turnstile data-sitekey="{{ $turnstileSiteKey }}" data-execution="execute" data-appearance="interaction-only" data-callback="onScheduleTurnstileSuccess" data-error-callback="onScheduleTurnstileError" data-expired-callback="onScheduleTurnstileExpired"></div></div>
+                    @endif
                     <button class="button button-primary" type="submit">{{ $en ? 'Schedule meeting' : 'Agendar reunião' }} <span>→</span></button>
                 </form>
             @else
@@ -74,6 +80,39 @@
         empty: @json($en ? 'No times available for this date' : 'Sem horários disponíveis nesta data'),
         error: @json($en ? 'Unable to load times' : 'Não foi possível carregar horários'),
     };
+    const turnstileEnabled = @json($showTurnstile);
+    const turnstileWidget = form.querySelector('[data-schedule-turnstile]');
+    let submittingAfterTurnstile = false;
+
+    const submitAfterTurnstile = () => {
+        submittingAfterTurnstile = true;
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+        } else {
+            form.submit();
+        }
+    };
+
+    window.onScheduleTurnstileSuccess = submitAfterTurnstile;
+    window.onScheduleTurnstileError = submitAfterTurnstile;
+    window.onScheduleTurnstileExpired = () => {
+        if (window.turnstile && turnstileWidget) window.turnstile.reset(turnstileWidget);
+    };
+
+    form.addEventListener('submit', (event) => {
+        if (!turnstileEnabled || submittingAfterTurnstile) {
+            submittingAfterTurnstile = false;
+            return;
+        }
+
+        const responseField = form.querySelector('input[name="cf-turnstile-response"]');
+        if (responseField && responseField.value) return;
+
+        if (window.turnstile && turnstileWidget) {
+            event.preventDefault();
+            window.turnstile.execute(turnstileWidget);
+        }
+    });
 
     const setOptions = (options, placeholder) => {
         timeField.innerHTML = '';
@@ -123,4 +162,7 @@
     if (dateField.value) loadSlots();
 })();
 </script>
+@if ($showTurnstile)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 @endsection

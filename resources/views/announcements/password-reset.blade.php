@@ -2,6 +2,10 @@
 @section('title', 'Restaurar acesso')
 
 @section('content')
+@php
+    $showTurnstile = $showTurnstile ?? false;
+    $turnstileSiteKey = $turnstileSiteKey ?? null;
+@endphp
 <main class="announcement-login">
     <div class="bd-login-orb" data-bd-login-orb aria-hidden="true"><span>BD</span></div>
     <a class="bd-access-back" href="{{ route('announcements.login') }}">← Voltar ao login</a>
@@ -27,6 +31,7 @@
 
         <form method="POST" action="{{ route('announcements.password.expired.store') }}" class="bd-access-form" autocomplete="off">
             @csrf
+            <div class="honeypot" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
             <label>
                 <span>Email</span>
                 <input
@@ -44,6 +49,9 @@
                 @error('bd_access_email')<small>{{ $message }}</small>@enderror
             </label>
 
+            @if ($showTurnstile)
+                <div class="turnstile-field"><div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}"></div></div>
+            @endif
             <button class="button button-primary" type="submit">Enviar link <span>→</span></button>
         </form>
 
@@ -53,5 +61,8 @@
         </div>
     </section>
 </main>
+@if ($showTurnstile)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 @include('announcements.partials.login-orb-script')
 @endsection
