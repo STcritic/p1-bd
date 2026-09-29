@@ -37,13 +37,13 @@
 </div>
 <div class="form-panel">
     @if (session('status'))<div class="alert-success" role="status">{{ session('status') }}</div>@endif
-    @if ($errors->any())<div class="alert-error" role="alert">{{ $en ? 'Please review the highlighted fields.' : 'Por favor, reveja os campos assinalados.' }}</div>@endif
+    @if ($errors->any())<div class="alert-error" role="alert">{{ $errors->first() ?: ($en ? 'Please review the highlighted fields.' : 'Por favor, reveja os campos assinalados.') }}</div>@endif
     <form method="POST" action="{{ route($en ? 'en.contact.store' : 'contact.store') }}" class="contact-form">
         @csrf
         <input type="hidden" name="form_started_at" value="{{ $formStartedAt }}">
         <div class="honeypot" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
         <div class="field-row"><label><span>{{ $en ? 'Name' : 'Nome' }} *</span><input name="name" value="{{ old('name') }}" required autocomplete="name" @class(['invalid' => $errors->has('name')])>@error('name')<small>{{ $message }}</small>@enderror</label><label><span>Email *</span><input type="email" name="email" value="{{ old('email') }}" required autocomplete="email" @class(['invalid' => $errors->has('email')])>@error('email')<small>{{ $message }}</small>@enderror</label></div>
-        <div class="field-row"><label><span>{{ $en ? 'Phone' : 'Telefone' }}</span><input name="phone" value="{{ old('phone') }}" autocomplete="tel"></label><label><span>{{ $en ? 'Company' : 'Empresa' }}</span><input name="company" value="{{ old('company') }}" autocomplete="organization"></label></div>
+        <div class="field-row"><label><span>{{ $en ? 'Phone' : 'Telefone' }}</span><input name="phone" value="{{ old('phone') }}" autocomplete="tel" @class(['invalid' => $errors->has('phone')])>@error('phone')<small>{{ $message }}</small>@enderror</label><label><span>{{ $en ? 'Company' : 'Empresa' }}</span><input name="company" value="{{ old('company') }}" autocomplete="organization" @class(['invalid' => $errors->has('company')])>@error('company')<small>{{ $message }}</small>@enderror</label></div>
         <label><span>{{ $en ? 'Subject' : 'Assunto' }} *</span><input name="subject" value="{{ old('subject', request('subject') ?? request('service')) }}" required @class(['invalid' => $errors->has('subject')])>@error('subject')<small>{{ $message }}</small>@enderror</label>
         <label><span>{{ $en ? 'How can we help?' : 'Como podemos ajudar?' }} *</span><textarea name="message" rows="6" required @class(['invalid' => $errors->has('message')])>{{ old('message', $diagnosticMessage) }}</textarea>@error('message')<small>{{ $message }}</small>@enderror</label>
         @if ($showTurnstile)

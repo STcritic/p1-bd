@@ -69,7 +69,7 @@ class WebsiteTest extends TestCase
         Mail::assertNothingSent();
     }
 
-    public function test_contact_fast_submission_is_silently_ignored(): void
+    public function test_contact_fast_submission_is_rejected_without_email(): void
     {
         Mail::fake();
 
@@ -77,14 +77,13 @@ class WebsiteTest extends TestCase
             'form_started_at' => Crypt::encryptString((string) microtime(true)),
         ]))
             ->assertRedirect()
-            ->assertSessionHas('status')
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasErrors(['contact_security']);
 
         $this->assertDatabaseCount(ContactMessage::class, 0);
         Mail::assertNothingSent();
     }
 
-    public function test_contact_turnstile_failure_is_silently_ignored(): void
+    public function test_contact_turnstile_failure_is_rejected_without_email(): void
     {
         Mail::fake();
         Http::fake([
@@ -101,8 +100,7 @@ class WebsiteTest extends TestCase
             'cf-turnstile-response' => 'bad-token',
         ]))
             ->assertRedirect()
-            ->assertSessionHas('status')
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasErrors(['contact_security']);
 
         $this->assertDatabaseCount(ContactMessage::class, 0);
         Mail::assertNothingSent();

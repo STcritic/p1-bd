@@ -15,6 +15,8 @@ class StoreContactRequest extends FormRequest
 {
     private array $spamReasons = [];
 
+    private bool $silentlyDrop = false;
+
     public function authorize(): bool
     {
         return true;
@@ -23,12 +25,12 @@ class StoreContactRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['bail', 'required', 'string', 'min:2', 'max:120', 'regex:/\A[\pL\pM .\'-]+\z/u'],
+            'name' => ['bail', 'required', 'string', 'min:2', 'max:120', 'regex:/\A[\pL\pM .,\'-]+\z/u'],
             'email' => ['bail', 'required', 'email:rfc,filter', 'max:180'],
             'phone' => ['nullable', 'string', 'min:7', 'max:30', 'regex:/\A[+()0-9\s.-]+\z/'],
-            'company' => ['nullable', 'string', 'max:120', 'not_regex:~https?://|www\.~i'],
-            'subject' => ['bail', 'required', 'string', 'min:4', 'max:160', 'not_regex:~https?://|www\.~i'],
-            'message' => ['bail', 'required', 'string', 'min:20', 'max:3000', 'not_regex:/<[^>]*>/'],
+            'company' => ['nullable', 'string', 'max:120'],
+            'subject' => ['bail', 'required', 'string', 'min:4', 'max:160'],
+            'message' => ['bail', 'required', 'string', 'min:10', 'max:3000'],
         ];
     }
 
@@ -45,7 +47,9 @@ class StoreContactRequest extends FormRequest
     {
         if ($this->spamReasons !== []) {
             $this->logSpamAttempt();
+        }
 
+        if ($this->silentlyDrop) {
             throw new HttpResponseException(
                 back()->with('status', $this->genericStatusMessage())
             );
@@ -57,7 +61,7 @@ class StoreContactRequest extends FormRequest
     private function checkHoneypot(Validator $validator): void
     {
         if (filled($this->input('website'))) {
-            $this->flagSpam($validator, 'honeypot');
+            $this->flagSpam($validator, 'honeypot', silent: true);
         }
     }
 
@@ -66,7 +70,7 @@ class StoreContactRequest extends FormRequest
         $encryptedStartedAt = $this->input('form_started_at');
 
         if (! is_string($encryptedStartedAt) || trim($encryptedStartedAt) === '') {
-            $this->flagSpam($validator, 'missing_form_timer');
+            $this->flagSpam($validator, 'missing_form_timer', silent: true);
 
             return;
         }
@@ -74,7 +78,7 @@ class StoreContactRequest extends FormRequest
         try {
             $startedAt = (float) Crypt::decryptString($encryptedStartedAt);
         } catch (Throwable) {
-            $this->flagSpam($validator, 'invalid_form_timer');
+            $this->flagSpam($validator, 'invalid_form_timer', silent: true);
 
             return;
         }
@@ -82,7 +86,7 @@ class StoreContactRequest extends FormRequest
         $minimumSeconds = max(0.0, (float) config('contact_form.minimum_seconds', 1.0));
 
         if ((microtime(true) - $startedAt) < $minimumSeconds) {
-            $this->flagSpam($validator, 'submitted_too_fast');
+            $this->flagSpam($validator, 'submitted_too_fast', $this->securityMessage('submitted_too_fast'));
         }
     }
 
@@ -95,7 +99,7 @@ class StoreContactRequest extends FormRequest
         $token = $this->input('cf-turnstile-response');
 
         if (! is_string($token) || trim($token) === '') {
-            $this->flagSpam($validator, 'missing_turnstile');
+            $this->flagSpam($validator, 'missing_turnstile', $this->securityMessage('missing_turnstile'));
 
             return;
         }
@@ -109,8 +113,6 @@ class StoreContactRequest extends FormRequest
                     'remoteip' => $this->ip(),
                 ]);
         } catch (Throwable $exception) {
-            $this->flagSpam($validator, 'turnstile_unavailable');
-
             Log::warning('Turnstile verification unavailable.', [
                 'message' => $exception->getMessage(),
             ]);
@@ -119,7 +121,7 @@ class StoreContactRequest extends FormRequest
         }
 
         if (! $response->ok() || ! (bool) $response->json('success')) {
-            $this->flagSpam($validator, 'turnstile_failed');
+            $this->flagSpam($validator, 'turnstile_failed', $this->securityMessage('turnstile_failed'));
 
             Log::notice('Turnstile verification failed.', [
                 'ip' => $this->ip(),
@@ -136,10 +138,28 @@ class StoreContactRequest extends FormRequest
             && filled(config('services.turnstile.secret_key'));
     }
 
-    private function flagSpam(Validator $validator, string $reason): void
+    private function flagSpam(Validator $validator, string $reason, ?string $message = null, bool $silent = false): void
     {
         $this->spamReasons[] = $reason;
-        $validator->errors()->add('contact_security', 'Suspicious contact submission.');
+        $this->silentlyDrop = $this->silentlyDrop || $silent;
+        $validator->errors()->add('contact_security', $message ?? 'Suspicious contact submission.');
+    }
+
+    private function securityMessage(string $reason): string
+    {
+        $en = $this->routeIs('en.*');
+
+        return match ($reason) {
+            'submitted_too_fast' => $en
+                ? 'Please wait a few seconds before sending the message.'
+                : 'Aguarde alguns segundos antes de enviar a mensagem.',
+            'missing_turnstile', 'turnstile_failed' => $en
+                ? 'We could not validate the anti-spam check. Please reload the page and try again.'
+                : 'Não foi possível validar a protecção anti-spam. Recarregue a página e tente novamente.',
+            default => $en
+                ? 'We could not validate this submission. Please try again.'
+                : 'Não foi possível validar esta submissão. Tente novamente.',
+        };
     }
 
     private function logSpamAttempt(): void
