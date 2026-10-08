@@ -58,7 +58,7 @@
 
         <div class="capability-bento">
             <article class="capability-card capability-featured">
-                <img src="{{ asset('assets/images/service_01.jpg') }}" alt="" loading="lazy">
+                <img src="{{ asset('assets/images/web.jpg') }}" alt="" loading="lazy">
                 <div class="capability-shade"></div>
                 <div class="capability-content"><span class="card-index">01 / {{ $en ? 'STRATEGY' : 'ESTRATÉGIA' }}</span><div><h3>{{ $en ? 'Human Capital Strategy' : 'Estratégia de Capital Humano' }}</h3><p>{{ $en ? 'Align structure, talent and leadership with the ambition of the business.' : 'Alinhar estrutura, talento e liderança com a ambição do negócio.' }}</p></div><a href="{{ route($en ? 'en.services' : 'services') }}" aria-label="{{ $en ? 'Explore Human Capital Strategy' : 'Explorar Estratégia de Capital Humano' }}">↗</a></div>
             </article>
